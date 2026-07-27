@@ -5,11 +5,11 @@ Refugees resettled in urban and semi-urban areas frequently face severe language
 Frontline service providers, including health workers, legal aid officers, and school enrollment staff, have no accessible, real-time translation tool that supports the primary languages spoken by refugee populations, such as Somali and Kiswahili.
 ## Repo Structure
 This repo is organized by track:
-- `/backend` — Server-side logic and APIs supporting the project's chosen solution
-- `/frontend` — User-facing interface for whichever solution the WG builds
-- `/data-ml` — Data collection, processing, and any model work related to the language-barrier problem
-- `/project-docs` — Project documentation: research background, meeting notes, and onboarding material
-- `/mobile` — Mobile implementation, if the WG's solution includes a mobile component
+- `/backend`:Server-side logic and APIs supporting the project's chosen solution
+- `/frontend` :User-facing interface for whichever solution the WG builds
+- `/data-ml` :Data collection, processing, and any model work related to the language-barrier problem
+- `/project-docs` :Project documentation: research background, meeting notes, and onboarding material
+- `/mobile` :Mobile implementation, if the WG's solution includes a mobile component
 See each folder's README for track-specific details.
 ## Who Is Affected:
 Refugees and the service providers trying to support them.
