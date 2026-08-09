@@ -1,11 +1,16 @@
-import React from 'react'
+import { Routes, Route } from "react-router";
+import LandingPage from "./pages/LandingPage";
+import SelectServicePage from "./pages/ServiceSelectionPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <h1 className='bg-red-500'>app</h1>
-    </div>
-  )
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/select-service" element={<SelectServicePage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
