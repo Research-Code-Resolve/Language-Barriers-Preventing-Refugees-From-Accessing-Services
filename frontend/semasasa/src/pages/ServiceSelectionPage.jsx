@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import Footer from "../components/Footer";
 import {
@@ -6,14 +7,23 @@ import {
   BriefcaseMedical,
   Scale,
   User,
+  Check,
 } from "lucide-react";
 
-export default function SelectServicePage() {
+export default function ServiceSelectionPage() {
   const navigate = useNavigate();
+  const [selectedService, setSelectedService] = useState(null);
+
+  const handleSelect = (serviceType) => {
+    setSelectedService(serviceType);
+    setTimeout(() => {
+      navigate(`/voice-translation?service=${serviceType}`);
+    }, 250);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#DCF5F2]/50">
-      <header className="bg-white border-b border-gray-100 px-4 sm:px-8 py-4 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col bg-[#DCF5F2]/40">
+      <header className="bg-white border-b border-gray-100 px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 z-10">
         <button
           onClick={() => navigate("/")}
           className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -41,44 +51,62 @@ export default function SelectServicePage() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-12 sm:py-20 flex flex-col items-center justify-center text-center">
-        <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
-          Welcome. How can we help today?
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 sm:py-16 flex flex-col items-center justify-center text-center">
+        <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3">
+          How can we help today?
         </h1>
-        <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-10 sm:mb-16">
-          Select a service context to begin real-time voice translation.
+        <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-10 sm:mb-14">
+          Select a service context to connect with a specialized interpreter.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 w-full max-w-3xl">
           <div
-            onClick={() => console.log("Health Services selected")}
-            className="bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center group"
+            onClick={() => handleSelect("health")}
+            className={`bg-white p-8 sm:p-10 rounded-3xl border transition-all cursor-pointer flex flex-col items-center text-center relative ${
+              selectedService === "health"
+                ? "border-[#2B8B7B] ring-2 ring-[#2B8B7B] shadow-lg scale-[1.02]"
+                : "border-gray-100 shadow-sm hover:shadow-md hover:border-teal-200"
+            }`}
           >
-            <div className="w-20 h-20 bg-[#C6F3ED] rounded-full flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+            {selectedService === "health" && (
+              <div className="absolute top-4 right-4 bg-[#2B8B7B] text-white p-1 rounded-full">
+                <Check className="w-4 h-4" />
+              </div>
+            )}
+            <div className="w-20 h-20 bg-[#C6F3ED] rounded-full flex items-center justify-center mb-6">
               <BriefcaseMedical className="w-10 h-10 text-[#2B8B7B]" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
               Health Services
             </h2>
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-              Medical consultations, clinical visits, and health-related
-              discussions requiring precise medical terminology.
+              Medical consultations, pharmacy visits, clinical assessments, and
+              hospital appointments.
             </p>
           </div>
 
           <div
-            onClick={() => console.log("Legal Services selected")}
-            className="bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center group"
+            onClick={() => handleSelect("legal")}
+            className={`bg-white p-8 sm:p-10 rounded-3xl border transition-all cursor-pointer flex flex-col items-center text-center relative ${
+              selectedService === "legal"
+                ? "border-[#2B8B7B] ring-2 ring-[#2B8B7B] shadow-lg scale-[1.02]"
+                : "border-gray-100 shadow-sm hover:shadow-md hover:border-teal-200"
+            }`}
           >
-            <div className="w-20 h-20 bg-[#C6F3ED] rounded-full flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+            {selectedService === "legal" && (
+              <div className="absolute top-4 right-4 bg-[#2B8B7B] text-white p-1 rounded-full">
+                <Check className="w-4 h-4" />
+              </div>
+            )}
+            <div className="w-20 h-20 bg-[#C6F3ED] rounded-full flex items-center justify-center mb-6">
               <Scale className="w-10 h-10 text-[#2B8B7B]" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
               Legal Services
             </h2>
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-              Legal consultations, courtroom discussions, and official
-              proceedings requiring strict adherence to legal context.
+              Immigration appointments, legal consultations, court hearings, and
+              document translation.
             </p>
           </div>
         </div>
