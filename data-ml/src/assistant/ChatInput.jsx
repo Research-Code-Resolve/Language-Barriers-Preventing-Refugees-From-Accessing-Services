@@ -1,12 +1,24 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { theme } from '../theme';
 import { SendIcon, MicIcon, FileIcon } from './icons';
 import { createRecognition, isRecognitionSupported } from './speech';
+
+const MAX_INPUT_HEIGHT = 150;
 
 export default function ChatInput({ onSend, onDocumentAttach, disabled, language = 'en' }) {
   const [value, setValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  // Auto-grow the textarea with its content (up to a max, then it scrolls), so
+  // long questions stay visible instead of being squeezed into one line.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT)}px`;
+  }, [value]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -91,6 +103,7 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
       </button>
       <style>{`@keyframes micpulse{0%,100%{opacity:1}50%{opacity:0.55}}`}</style>
       <textarea
+        ref={textareaRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={isListening ? 'Listening…' : 'Type your question here...'}
@@ -110,10 +123,13 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
           borderRadius: 12,
           padding: '10px 12px',
           fontSize: 14,
+          lineHeight: 1.4,
           fontFamily: "'Segoe UI', sans-serif",
           color: theme.textPrimary,
           textAlign: language === 'ar' ? 'right' : 'left',
-          maxHeight: 100,
+          minHeight: 44,
+          maxHeight: MAX_INPUT_HEIGHT,
+          overflowY: 'auto',
           boxSizing: 'border-box',
         }}
       />
