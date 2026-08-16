@@ -20,6 +20,15 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: theme.bg, fontFamily: "'Segoe UI', sans-serif" }}>
+      {/* Visible keyboard-focus ring for accessibility (components use inline
+          styles, so this global rule provides the focus indicator). */}
+      <style>{`
+        :focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(65, 153, 203, 0.5);
+          border-radius: 8px;
+        }
+      `}</style>
       {/* Top navigation */}
       <nav style={{
         background: theme.white,

@@ -3,9 +3,12 @@ import SourceCitation from './SourceCitation';
 import { SpeakerIcon } from './icons';
 import { speak, isSynthesisSupported } from './speech';
 
+const RTL_LANGUAGES = ['ar'];
+
 export default function MessageBubble({ message, language = 'en' }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
+  const isRtl = RTL_LANGUAGES.includes(language);
 
   const bubbleStyle = isUser
     ? {
@@ -49,6 +52,8 @@ export default function MessageBubble({ message, language = 'en' }) {
           lineHeight: 1.5,
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
+          direction: isRtl ? 'rtl' : 'ltr',
+          textAlign: isRtl ? 'right' : 'left',
         }}>
           {message.text}
         </div>
@@ -57,6 +62,7 @@ export default function MessageBubble({ message, language = 'en' }) {
             type="button"
             onClick={() => speak(message.text, language)}
             title="Read aloud"
+            aria-label="Read message aloud"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

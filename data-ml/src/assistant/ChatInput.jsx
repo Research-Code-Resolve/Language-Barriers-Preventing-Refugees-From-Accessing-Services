@@ -70,6 +70,7 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
         onClick={onDocumentAttach}
         style={btnBase}
         title="Attach from Document Scanner"
+        aria-label="Attach a document from the Document Scanner"
       >
         <FileIcon />
       </button>
@@ -83,6 +84,8 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
           animation: isListening ? 'micpulse 1.2s ease-in-out infinite' : 'none',
         }}
         title={isListening ? 'Listening… tap to stop' : 'Speak your question'}
+        aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
+        aria-pressed={isListening}
       >
         <MicIcon />
       </button>
@@ -91,7 +94,9 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={isListening ? 'Listening…' : 'Type your question here...'}
+        aria-label="Type your question"
         rows={1}
+        dir={language === 'ar' ? 'rtl' : 'ltr'}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -107,13 +112,14 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
           fontSize: 14,
           fontFamily: "'Segoe UI', sans-serif",
           color: theme.textPrimary,
-          outline: 'none',
+          textAlign: language === 'ar' ? 'right' : 'left',
           maxHeight: 100,
           boxSizing: 'border-box',
         }}
       />
       <button
         type="submit"
+        aria-label="Send message"
         disabled={disabled || !value.trim()}
         style={{
           ...btnBase,
