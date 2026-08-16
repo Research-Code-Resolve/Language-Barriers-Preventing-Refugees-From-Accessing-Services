@@ -40,7 +40,20 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
-    const entries = retrieve(KB, { message, location, serviceType });
+    // The knowledge base is in English and retrieval is keyword-based, so a
+    // question typed in another language would not match. Translate the query
+    // to English for retrieval only — the LLM still receives the original
+    // question and answers in the user's language.
+    let retrievalQuery = message;
+    if (language && language !== 'en') {
+      try {
+        retrievalQuery = (await translateText(message, language, 'en')) || message;
+      } catch (err) {
+        console.warn(`[chat] query translation failed, using original: ${err.message}`);
+      }
+    }
+
+    const entries = retrieve(KB, { message: retrievalQuery, location, serviceType });
 
     const system = buildSystemPrompt(language);
     const user = buildUserPrompt({ message, entries, documentContext });
