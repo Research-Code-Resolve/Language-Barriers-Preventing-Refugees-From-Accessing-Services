@@ -33,8 +33,7 @@ It integrates naturally alongside SemaSasa's existing Health and Legal service f
 - **Tesseract.js** — client-side OCR engine (WebAssembly-based) for images and scanned PDFs
 - **pdfjs-dist** — extracts embedded text directly from PDF files, with OCR fallback for scanned/image-only PDFs
 - **mammoth** — extracts text from Word (.docx) documents
-- **MyMemory Translation API** — lightweight, CORS-enabled translation for English, Arabic, Swahili, and French
-- **Hugging Face NLLB (facebook/nllb-200-distilled-600M)** — translation for Somali and Kinyarwanda, with automatic fallback to MyMemory if unavailable
+- **Backend translation proxy** (`POST /api/translate`) — translation now runs server-side (MyMemory + Hugging Face NLLB) so the API token never reaches the browser. `translate.js` is a thin client to it.
 - **localStorage** — scan-event logging for the analytics panel (timestamp only; no document content is stored)
 - No dependency on the main app's authentication or database layer
 
@@ -60,14 +59,15 @@ src/
   DocumentScanner.jsx               — OCR upload, extraction, editing, and translation UI
   ScanStats.jsx                     — scan activity analytics panel
   storage.js                        — localStorage helper for scan-event logging
-  translate.js                      — translation API helper (MyMemory + NLLB)
+  translate.js                      — thin client to the backend /api/translate endpoint
+  speech.js                         — Web Speech API helpers (voice input + read-aloud)
   fileReaders.js                    — OCR, PDF, and DOCX extraction logic
   theme.js                          — shared design tokens and supported language/location/service lists
   main.jsx                          — app entry point
   assistant/
     RefugeeSupportAssistant.jsx     — main assistant chat interface
-    ChatInput.jsx                   — message input, with document attach and voice (planned) controls
-    chatService.js                  — chat request handler (currently mock; swappable for a live backend)
+    ChatInput.jsx                   — message input, with document attach and voice input (Web Speech API)
+    chatService.js                  — chat request handler (RAG backend via VITE_USE_MOCK/VITE_CHAT_API; mock fallback)
     mockResponses.js                — demo response content, keyed by language and topic
     MessageBubble.jsx               — chat message rendering
     SourceCitation.jsx              — demo/verified response labeling
@@ -82,14 +82,13 @@ src/
 - Somali and Kinyarwanda have no dedicated OCR trained-data model in Tesseract.js. Both are approximated using the English Latin-script model, which reads the correct letters but without language-specific word correction — extraction accuracy for these two languages will be lower than for English, Arabic, French, or Swahili. The extracted text box is editable so this can be corrected manually before translating.
 - Translation for Somali and Kinyarwanda routes through Hugging Face's hosted NLLB model, which may take 10–20 seconds to respond on first use after a period of inactivity, while the hosted model loads.
 - The MyMemory API's free tier has daily rate limits; production use at scale may warrant a dedicated translation provider.
-- The Refugee Support Assistant currently runs on mock responses (`chatService.js`, `USE_MOCK = true`). It is structured to be swapped for a live backend by changing this flag and implementing the `/api/chat` endpoint described in `chatService.js`.
+- The Refugee Support Assistant can run against the RAG backend (`backend/`, `POST /api/chat`) or fall back to built-in mock responses, controlled by `VITE_USE_MOCK` / `VITE_CHAT_API`.
 
 ## Roadmap
 
 - Replace `storage.js`'s localStorage logic with a persistent `document_scans` table once connected to a backend — no changes needed elsewhere in the feature
-- Connect the Refugee Support Assistant to a live, retrieval-backed knowledge source in place of mock responses
 - Expand analytics with breakdowns by document type or language pair
-- Move the Hugging Face API token out of client-side code and behind a lightweight backend proxy before any production deployment
+- Rotate the Hugging Face token before any public deployment (a token was previously committed to git history; it now lives only in `backend/.env`)
 
 ## Usage
 
