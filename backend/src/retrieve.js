@@ -12,12 +12,16 @@ const STOPWORDS = new Set([
   'what', 'should', 'about', 'with', 'need', 'help', 'please',
 ]);
 
+// Place names are already handled by the location filter, so treating them as
+// keywords just adds noise (every Kakuma entry would "match" the word Kakuma).
+const LOCATION_TERMS = new Set(['kakuma', 'kalobeyei', 'bidibidi', 'dadaab']);
+
 function tokenize(text) {
   return (text || '')
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s]/gu, ' ')
     .split(/\s+/)
-    .filter((t) => t.length > 1 && !STOPWORDS.has(t));
+    .filter((t) => t.length > 1 && !STOPWORDS.has(t) && !LOCATION_TERMS.has(t));
 }
 
 // Map the UI's serviceType to knowledge-base categories. The UI groups
@@ -46,8 +50,22 @@ export function retrieve(entries, { message, location, serviceType }, topK = 4) 
     for (const tok of haystack) {
       if (queryTokens.has(tok)) overlap++;
     }
-    const categoryBoost = preferredCategories.includes(entry.category.toLowerCase()) ? 1.5 : 0;
-    return { entry, score: overlap + categoryBoost };
+    const relevant = overlap > 0;
+    const isCurated = entry.category !== 'document';
+
+    // Only nudge on category when the entry is already topically relevant, so a
+    // service-type match can't surface an otherwise-irrelevant entry.
+    const categoryBoost = relevant && preferredCategories.includes(entry.category.toLowerCase()) ? 1.5 : 0;
+
+    // Curated entries that are relevant always rank above document passages.
+    // Document chunks are long and keyword-rich (a repeated word inflates their
+    // score) and would otherwise bury the precise, human-verified curated
+    // answers. Documents still lead when NO curated entry is relevant — e.g. a
+    // fact that only exists in an uploaded document (an ambulance number, etc.).
+    const CURATED_TIER = 100;
+    const curatedBoost = relevant && isCurated ? CURATED_TIER : 0;
+
+    return { entry, score: overlap + categoryBoost + curatedBoost };
   });
 
   scored.sort((a, b) => b.score - a.score);
