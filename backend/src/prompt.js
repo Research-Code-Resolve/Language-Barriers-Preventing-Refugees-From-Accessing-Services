@@ -35,12 +35,13 @@ export function buildContext(entries) {
   }
   return entries
     .map((e, i) => {
-      return [
-        `[${i + 1}] (${e.location}, ${e.category})`,
-        `Q: ${e.question}`,
-        `A: ${e.answer}`,
-        `Source: ${e.source_title}${e.source_url ? ` — ${e.source_url}` : ''}`,
-      ].join('\n');
+      const header = `[${i + 1}] (${e.location || 'general'}, ${e.category})`;
+      // Curated entries have a Q/A shape; document passages are raw text.
+      const body = e.question
+        ? `Q: ${e.question}\nA: ${e.answer}`
+        : e.answer;
+      const source = `Source: ${e.source_title}${e.source_url ? ` — ${e.source_url}` : ''}`;
+      return [header, body, source].join('\n');
     })
     .join('\n\n');
 }

@@ -84,10 +84,16 @@ VITE_TRANSLATE_API=http://localhost:8787/api/translate
 
 ## Knowledge base
 
-Content is **curated, not scraped**: official pages (help.unhcr.org, etc.) are
-read and hand-written into structured CSV rows with `source_url`. An entry only
-counts as verified once a human fills its `last_verified` field. See the entries
-in `../data-ml/refugee_knowledge_base.csv`.
+Lives in `../knowledge_base/` and has two layers, both searched by the retrieval
+step (see that folder's README):
+
+1. **`refugee_knowledge_base.csv`** — curated Q&A. Content is **curated, not
+   scraped**: official pages are read and hand-written into structured rows with
+   `source_url`. An entry counts as verified only once a human fills its
+   `last_verified` field.
+2. **`documents/`** — drop a `.docx`, `.pdf`, `.txt`, or `.md` file and restart
+   the server; `src/documents.js` extracts and chunks it into searchable
+   passages (always unverified until reviewed).
 
 ## Security
 

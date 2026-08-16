@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { loadKnowledgeBase } from './src/knowledgeBase.js';
+import { loadDocuments } from './src/documents.js';
 import { retrieve } from './src/retrieve.js';
 import { buildSystemPrompt, buildUserPrompt } from './src/prompt.js';
 import { generateAnswer, llmStatus } from './src/llm.js';
@@ -12,10 +13,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Load the knowledge base once at startup.
+// Load the knowledge base once at startup: curated CSV entries + passages
+// extracted from any documents dropped in knowledge_base/documents.
 let KB = [];
 try {
-  KB = loadKnowledgeBase();
+  const curated = loadKnowledgeBase();
+  const docs = await loadDocuments();
+  KB = [...curated, ...docs];
+  console.log(`[kb] total ${KB.length} entries (${curated.length} curated + ${docs.length} document passages)`);
 } catch (err) {
   console.error(`[kb] failed to load knowledge base: ${err.message}`);
 }
