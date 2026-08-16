@@ -1,15 +1,44 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { theme } from '../theme';
 import { SendIcon, MicIcon, FileIcon } from './icons';
+import { createRecognition, isRecognitionSupported } from './speech';
 
-export default function ChatInput({ onSend, onDocumentAttach, disabled }) {
+export default function ChatInput({ onSend, onDocumentAttach, disabled, language = 'en' }) {
   const [value, setValue] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!value.trim() || disabled) return;
     onSend(value.trim());
     setValue('');
+  }
+
+  function handleMic() {
+    if (!isRecognitionSupported()) {
+      alert('Voice input is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+    // Toggle off if already listening.
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = createRecognition(language);
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setValue((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    setIsListening(true);
+    recognition.start();
   }
 
   const btnBase = {
@@ -44,13 +73,24 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled }) {
       >
         <FileIcon />
       </button>
-      <button type="button" style={btnBase} title="Voice input (coming soon)">
+      <button
+        type="button"
+        onClick={handleMic}
+        style={{
+          ...btnBase,
+          color: isListening ? theme.white : theme.blue,
+          background: isListening ? '#ef4444' : 'none',
+          animation: isListening ? 'micpulse 1.2s ease-in-out infinite' : 'none',
+        }}
+        title={isListening ? 'Listening… tap to stop' : 'Speak your question'}
+      >
         <MicIcon />
       </button>
+      <style>{`@keyframes micpulse{0%,100%{opacity:1}50%{opacity:0.55}}`}</style>
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Type your question here..."
+        placeholder={isListening ? 'Listening…' : 'Type your question here...'}
         rows={1}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {

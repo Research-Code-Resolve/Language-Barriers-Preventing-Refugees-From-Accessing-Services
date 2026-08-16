@@ -1,7 +1,9 @@
 import { theme } from '../theme';
 import SourceCitation from './SourceCitation';
+import { SpeakerIcon } from './icons';
+import { speak, isSynthesisSupported } from './speech';
 
-export default function MessageBubble({ message }) {
+export default function MessageBubble({ message, language = 'en' }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
 
@@ -50,6 +52,30 @@ export default function MessageBubble({ message }) {
         }}>
           {message.text}
         </div>
+        {isAssistant && isSynthesisSupported() && (
+          <button
+            type="button"
+            onClick={() => speak(message.text, language)}
+            title="Read aloud"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              marginTop: 6,
+              padding: '3px 10px',
+              background: theme.white,
+              border: `1px solid ${theme.border}`,
+              borderRadius: 20,
+              fontSize: 11,
+              fontWeight: 600,
+              color: theme.blue,
+              cursor: 'pointer',
+            }}
+          >
+            <SpeakerIcon width={13} height={13} />
+            Listen
+          </button>
+        )}
         {isAssistant && message.source && (
           <SourceCitation source={message.source} verified={message.verified === true} />
         )}

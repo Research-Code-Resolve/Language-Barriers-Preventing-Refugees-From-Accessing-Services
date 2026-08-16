@@ -208,13 +208,13 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
                 isDemo: true,
                 verified: false,
                 timestamp: formatTime(Date.now()),
-              }} />
+              }} language={language} />
               <SuggestedQuestions onSelect={handleSuggestion} />
             </>
           )}
 
           {messages.map((msg, i) => (
-            <MessageBubble key={i} message={msg} />
+            <MessageBubble key={i} message={msg} language={language} />
           ))}
 
           {/* Document action buttons */}
@@ -317,6 +317,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
           onSend={handleSend}
           onDocumentAttach={onNavigateScanner}
           disabled={isTyping}
+          language={language}
         />
       </div>
 
