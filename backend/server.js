@@ -47,12 +47,16 @@ app.post('/api/chat', async (req, res) => {
 
     const { text, mode } = await generateAnswer({ system, user, entries });
 
-    // An answer is only "verified" when every grounding entry has been
-    // human-verified (last_verified set). The seed data is unverified, so
-    // the UI will correctly label these as demo responses until reviewed.
-    const verified = entries.length > 0 && entries.every((e) => e.verified);
+    // An answer is "verified" when its primary (top-ranked) grounding source is
+    // a human-verified curated entry. We don't require *every* retrieved entry
+    // to be verified, because document passages (always unverified raw text) are
+    // frequently mixed in and would otherwise force every answer to "demo".
+    const verified = entries.length > 0 && entries[0].verified === true;
 
-    const sources = [...new Set(entries.map((e) => e.source_title).filter(Boolean))];
+    // When the answer is verified, cite only the verified sources (keeps
+    // unverified document passages out of the "Verified · Source" label).
+    const citedEntries = verified ? entries.filter((e) => e.verified) : entries;
+    const sources = [...new Set(citedEntries.map((e) => e.source_title).filter(Boolean))];
 
     res.json({ answer: text, sources, verified, mode });
   } catch (err) {
