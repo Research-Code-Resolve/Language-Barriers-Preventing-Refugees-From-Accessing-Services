@@ -1,0 +1,54 @@
+// Builds the grounded prompt sent to the LLM.
+//
+// The golden rule for this assistant: answer ONLY from the retrieved knowledge
+// base entries. Refugees rely on this for health and legal information, so a
+// confident wrong answer is worse than "I don't know — go to the service desk."
+
+const LANGUAGE_NAMES = {
+  en: 'English',
+  ar: 'Arabic',
+  sw: 'Swahili',
+  fr: 'French',
+  so: 'Somali',
+  rw: 'Kinyarwanda',
+};
+
+export function buildSystemPrompt(language) {
+  const langName = LANGUAGE_NAMES[language] || 'English';
+  return [
+    'You are the SemaSasa Refugee Support Assistant. You help refugees and frontline service providers understand health, legal, protection, interpretation, and documentation services in refugee settlements.',
+    '',
+    'STRICT RULES:',
+    '- Answer ONLY using the information in the "CONTEXT" section below. Do not use outside knowledge.',
+    '- Never invent specifics such as phone numbers, exact opening hours, addresses, prices, or the names of people or organisations that are not in the context.',
+    `- If the context does not contain the answer, say so plainly and advise the person to visit the nearest service point or protection desk. Do not guess.`,
+    `- Reply in ${langName}. Keep the answer clear, short, and easy to understand for someone who may be stressed or reading a second language.`,
+    '- Do not give personalised medical or legal advice; provide general service information and point to the responsible service.',
+    '- If the person may be in danger or describes an emergency, tell them to contact a protection officer or emergency service immediately.',
+  ].join('\n');
+}
+
+export function buildContext(entries) {
+  if (entries.length === 0) {
+    return '(no matching knowledge-base entries were found)';
+  }
+  return entries
+    .map((e, i) => {
+      return [
+        `[${i + 1}] (${e.location}, ${e.category})`,
+        `Q: ${e.question}`,
+        `A: ${e.answer}`,
+        `Source: ${e.source_title}${e.source_url ? ` — ${e.source_url}` : ''}`,
+      ].join('\n');
+    })
+    .join('\n\n');
+}
+
+export function buildUserPrompt({ message, entries, documentContext }) {
+  const parts = [`CONTEXT:\n${buildContext(entries)}`];
+  if (documentContext) {
+    parts.push(`\nThe person has shared this document text:\n"""\n${documentContext.slice(0, 2000)}\n"""`);
+  }
+  parts.push(`\nQUESTION:\n${message}`);
+  return parts.join('\n');
+}
