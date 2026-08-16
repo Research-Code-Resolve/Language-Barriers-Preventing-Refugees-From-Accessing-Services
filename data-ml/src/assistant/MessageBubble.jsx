@@ -82,13 +82,10 @@ export default function MessageBubble({ message, language = 'en' }) {
             Listen
           </button>
         )}
-        {isAssistant && message.source && (
-          <SourceCitation source={message.source} verified={message.verified === true} />
-        )}
-        {isAssistant && message.isDemo && !message.source && (
-          <p style={{ fontSize: 11, color: theme.textSecondary, marginTop: 4, fontStyle: 'italic' }}>
-            Demo response — will be replaced with verified RAG-backed answers.
-          </p>
+        {/* Only show the trust badge for human-verified answers. Unverified
+            answers show no label (rather than a "Demo response" tag). */}
+        {isAssistant && message.verified === true && message.source && (
+          <SourceCitation source={message.source} verified={true} />
         )}
         {message.timestamp && (
           <p style={{
