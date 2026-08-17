@@ -6,6 +6,8 @@
 
 export const STRINGS = {
   en: {
+    documentScanner: 'Document Scanner',
+    aiAssistant: 'AI Assistant',
     title: 'Refugee Support Assistant',
     subtitle: 'Get trusted help in your language for health and legal services.',
     intro: 'Ask questions, understand service information, and get guidance in your preferred language.',
@@ -28,6 +30,8 @@ export const STRINGS = {
     error: 'Sorry, I could not process your request right now. Please try again.',
   },
   fr: {
+    documentScanner: 'Scanner de documents',
+    aiAssistant: 'Assistant IA',
     title: "Assistant d'aide aux réfugiés",
     subtitle: 'Obtenez une aide fiable dans votre langue pour les services de santé et juridiques.',
     intro: 'Posez des questions, comprenez les informations sur les services et recevez des conseils dans votre langue.',
@@ -50,6 +54,8 @@ export const STRINGS = {
     error: "Désolé, je n'ai pas pu traiter votre demande pour le moment. Veuillez réessayer.",
   },
   ar: {
+    documentScanner: 'ماسح المستندات',
+    aiAssistant: 'المساعد الذكي',
     title: 'مساعد دعم اللاجئين',
     subtitle: 'احصل على مساعدة موثوقة بلغتك للخدمات الصحية والقانونية.',
     intro: 'اطرح الأسئلة، وافهم معلومات الخدمات، واحصل على التوجيه بلغتك المفضلة.',
@@ -72,6 +78,8 @@ export const STRINGS = {
     error: 'عذراً، لم أتمكن من معالجة طلبك الآن. يرجى المحاولة مرة أخرى.',
   },
   sw: {
+    documentScanner: 'Kichanganuzi cha Hati',
+    aiAssistant: 'Msaidizi wa AI',
     title: 'Msaidizi wa Wakimbizi',
     subtitle: 'Pata msaada wa kuaminika katika lugha yako kwa huduma za afya na kisheria.',
     intro: 'Uliza maswali, elewa taarifa za huduma, na upate mwongozo katika lugha unayopendelea.',
@@ -95,6 +103,8 @@ export const STRINGS = {
   },
   // --- Somali: machine-assisted, REVIEW WITH A NATIVE SPEAKER before production ---
   so: {
+    documentScanner: 'Iskaanka Dukumeentiga',
+    aiAssistant: 'Kaaliyaha AI',
     title: 'Kaaliyaha Taageerada Qaxootiga',
     subtitle: 'Hel caawimaad la aamin karo oo luqaddaada ku ah adeegyada caafimaad iyo sharci.',
     intro: "Weydii su'aalo, faham macluumaadka adeegyada, oo hel hagitaan luqaddaada aad doorbidayso.",
@@ -118,6 +128,8 @@ export const STRINGS = {
   },
   // --- Kinyarwanda: machine-assisted, REVIEW WITH A NATIVE SPEAKER before production ---
   rw: {
+    documentScanner: "Isikana ry'Inyandiko",
+    aiAssistant: 'Umufasha wa AI',
     title: "Umufasha w'Impunzi",
     subtitle: "Bona ubufasha bwizewe mu rurimi rwawe ku byerekeye serivisi z'ubuzima n'amategeko.",
     intro: 'Baza ibibazo, sobanukirwa amakuru ya serivisi, kandi ubone ubuyobozi mu rurimi ukunda.',

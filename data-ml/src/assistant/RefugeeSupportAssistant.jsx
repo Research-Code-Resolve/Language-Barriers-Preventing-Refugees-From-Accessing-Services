@@ -18,9 +18,8 @@ function formatTime(ts) {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumentTextConsumed, onNavigateScanner }) {
+export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumentTextConsumed, onNavigateScanner, language = 'en', setLanguage }) {
   const [location, setLocation] = useState('kakuma');
-  const [language, setLanguage] = useState('en');
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [showEscalation, setShowEscalation] = useState(false);

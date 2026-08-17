@@ -4,10 +4,13 @@ import ScanStats from './ScanStats';
 import RefugeeSupportAssistant from './assistant/RefugeeSupportAssistant';
 import { theme } from './theme';
 import { FileIcon } from './assistant/icons';
+import { t } from './assistant/i18n';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('scanner');
   const [pendingDocumentText, setPendingDocumentText] = useState('');
+  // Assistant language is lifted here so the top nav tabs localise with it.
+  const [language, setLanguage] = useState('en');
 
   const handleAskAIAboutDocument = useCallback((text) => {
     setPendingDocumentText(text);
@@ -51,12 +54,12 @@ export default function App() {
             active={activeTab === 'scanner'}
             onClick={() => setActiveTab('scanner')}
             icon={<FileIcon width={18} height={18} />}
-            label="Document Scanner"
+            label={t('documentScanner', language)}
           />
           <TabButton
             active={activeTab === 'assistant'}
             onClick={() => setActiveTab('assistant')}
-            label="AI Assistant"
+            label={t('aiAssistant', language)}
           />
         </div>
       </nav>
@@ -74,6 +77,8 @@ export default function App() {
             pendingDocumentText={pendingDocumentText}
             onDocumentTextConsumed={handleDocumentTextConsumed}
             onNavigateScanner={() => setActiveTab('scanner')}
+            language={language}
+            setLanguage={setLanguage}
           />
         )}
       </div>
