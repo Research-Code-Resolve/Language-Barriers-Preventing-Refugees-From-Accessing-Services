@@ -1,99 +1,135 @@
-```markdown
-# SemaSasa OCR Analytics
+# SemaSasa — Document Scanner & Refugee Support Assistant
 
-A machine learning-powered feature set that lets health and legal service providers scan physical documents — ID cards, prescriptions, referral forms, legal notices — and instantly extract, translate, and get AI-assisted help understanding them, removing the need for manual retyping across language barriers.
+Two connected tools that help health and legal service providers work with
+refugees across language barriers:
 
-## Overview
+1. **Document Scanner** — scan a physical document (ID card, prescription,
+   referral form, legal notice), extract its text with in-browser OCR, and
+   translate it, removing the need for manual retyping.
+2. **Refugee Support Assistant** — a multilingual RAG chatbot that answers
+   questions about health, legal, protection and documentation services, in the
+   user's own language, grounded in a verified knowledge base.
 
-Refugees and service providers frequently need to work with physical paperwork written in a language one party doesn't read. This feature extends SemaSasa's language-access mission beyond voice translation: service providers can upload a photo, scanned image, PDF, or Word document, extract its text using an in-browser OCR model, translate it into any of SemaSasa's supported languages, and hand it off to an AI assistant for further help understanding it.
-
-It integrates naturally alongside SemaSasa's existing Health and Legal service flows, giving providers a fast, self-contained way to process paperwork on the spot.
+Both share a brand palette (`theme.js`) and can hand off document text from the
+scanner into the assistant.
 
 ## Features
 
 ### Document Scanner
-- **Multi-format upload** — photos, scanned images, PDFs, and Word (.docx) documents
-- **Automatic text extraction** — OCR for images and scanned PDFs runs entirely in the browser; text-based PDFs and DOCX files are parsed directly for higher accuracy
-- **Editable extracted text** — extracted text appears in an editable box so it can be reviewed and corrected before translating, particularly useful for lower-resource languages
-- **Multi-language translation** — translate extracted text into English, Arabic, Swahili, French, Somali, or Kinyarwanda
-- **Right-to-left support** — Arabic text displays correctly in both extraction and translation views
-- **Copy to clipboard** — quickly copy the original or translated text for use elsewhere
-- **Scan analytics** — a lightweight activity panel tracks documents scanned today, this week, and in total, providing an early, data-driven view into feature usage
+- **Multi-format upload** — photos, scanned images, PDFs, and Word (.docx) files.
+- **Automatic text extraction** — OCR for images and scanned PDFs runs in the
+  browser (Tesseract.js); text-based PDFs and DOCX are parsed directly.
+- **Editable extracted text** — review and correct before translating, useful
+  for lower-resource languages.
+- **Translation** — into English, Arabic, Swahili, French, Somali, or
+  Kinyarwanda, via the backend translation proxy (see below).
+- **Right-to-left support** — Arabic displays correctly.
+- **Copy to clipboard** and a lightweight **scan-analytics** panel (counts only,
+  no document content stored).
 
 ### Refugee Support Assistant
-- **Conversational AI assistant** — service providers and refugees can ask questions about health and legal services in their preferred language
-- **Context-aware** — responses adapt based on selected location, language, and service type (health or legal)
-- **Document handoff** — extracted or translated document text can be sent directly from the Document Scanner into the assistant via "Ask AI about this document," so the assistant can help explain the content
-- **Suggested questions** — common questions are surfaced to guide first-time users
-- **Escalation pathway** — flags when a user may need direct human support (interpreter, health, or legal/protection contact) and offers next steps
-- **Source citation** — responses are labeled as demo or verified, with source attribution built in for when the system connects to a live knowledge backend
+- **Grounded RAG answers** — the assistant answers only from the knowledge base
+  (`knowledge_base/`: curated Q&A + ingested documents), and says it doesn't know
+  rather than guessing. See `backend/README.md`.
+- **Multilingual** — ask in any supported language: the query is translated for
+  retrieval and the answer comes back in the user's language.
+- **Open-source LLM** — generation runs server-side (default: an open-source
+  model via Hugging Face); provider is configurable in the backend.
+- **Localised interface** — all UI text is translated (`i18n.js`) into the six
+  languages, with the whole assistant flipping to RTL for Arabic.
+- **Voice** — ask by speaking (speech-to-text) and have answers read aloud
+  (`speech.js`, Web Speech API; Chrome/Edge).
+- **Verified sources** — human-verified answers show a discreet "Verified ·
+  Source" line; unverified answers show no badge.
+- **Document handoff** — send extracted text from the scanner via "Ask AI about
+  this document."
+- **Suggested questions**, a **safety notice**, and an **escalation** prompt for
+  when a user needs direct human support.
 
 ## Tech stack
 
-- **Tesseract.js** — client-side OCR engine (WebAssembly-based) for images and scanned PDFs
-- **pdfjs-dist** — extracts embedded text directly from PDF files, with OCR fallback for scanned/image-only PDFs
-- **mammoth** — extracts text from Word (.docx) documents
-- **Backend translation proxy** (`POST /api/translate`) — translation now runs server-side (MyMemory + Hugging Face NLLB) so the API token never reaches the browser. `translate.js` is a thin client to it.
-- **localStorage** — scan-event logging for the analytics panel (timestamp only; no document content is stored)
-- No dependency on the main app's authentication or database layer
-
-## Analytics
-
-Every completed scan logs a timestamp locally, with no document content retained. The analytics panel surfaces this data as three at-a-glance metrics:
-
-- Documents scanned **today**
-- Documents scanned **this week**
-- Documents scanned **all time**
-
-This provides a foundation for usage tracking that can later be extended into fuller reporting once connected to persistent storage.
-
-## Design
-
-Visual styling follows the SemaSasa brand palette — a blue-to-teal gradient with clean white surfaces — for a cohesive, professional look consistent with the rest of the app. A shared `theme.js` centralizes colors, typography values, and supported language/location/service lists used across both the Document Scanner and the Assistant.
+- **Tesseract.js** — client-side OCR for images and scanned PDFs.
+- **pdfjs-dist** — extracts embedded text from PDFs (OCR fallback for scans).
+- **mammoth** — extracts text from Word (.docx) files.
+- **Backend** (`../backend`) — hosts translation (`POST /api/translate`) and the
+  RAG chat (`POST /api/chat`), so the Hugging Face token stays server-side and
+  never reaches the browser. `translate.js` and `chatService.js` are thin clients.
+- **Web Speech API** — voice input and read-aloud.
+- **localStorage** — scan-event logging (timestamp only).
+- No dependency on the main app's authentication or database layer.
 
 ## File structure
 
 ```
 src/
-  App.jsx                          — top-level tab navigation between Scanner and Assistant
-  DocumentScanner.jsx               — OCR upload, extraction, editing, and translation UI
-  ScanStats.jsx                     — scan activity analytics panel
-  storage.js                        — localStorage helper for scan-event logging
-  translate.js                      — thin client to the backend /api/translate endpoint
-  speech.js                         — Web Speech API helpers (voice input + read-aloud)
-  fileReaders.js                    — OCR, PDF, and DOCX extraction logic
-  theme.js                          — shared design tokens and supported language/location/service lists
-  main.jsx                          — app entry point
+  App.jsx                          — tab navigation; owns the shared language state
+  DocumentScanner.jsx              — OCR upload, extraction, editing, translation UI
+  ScanStats.jsx                    — scan-activity analytics panel
+  storage.js                       — localStorage helper for scan-event logging
+  translate.js                     — thin client to the backend /api/translate
+  fileReaders.js                   — OCR, PDF, and DOCX extraction logic
+  theme.js                         — design tokens + supported languages/locations
+  main.jsx                         — app entry point
   assistant/
-    RefugeeSupportAssistant.jsx     — main assistant chat interface
-    ChatInput.jsx                   — message input, with document attach and voice input (Web Speech API)
-    chatService.js                  — chat request handler (RAG backend via VITE_USE_MOCK/VITE_CHAT_API; mock fallback)
-    mockResponses.js                — demo response content, keyed by language and topic
-    MessageBubble.jsx               — chat message rendering
-    SourceCitation.jsx              — demo/verified response labeling
-    SafetyNotice.jsx                — safety disclaimer and escalation prompt
-    Selectors.jsx                   — location, language, and service type selectors
-    SuggestedQuestions.jsx          — starter question prompts
-    icons.jsx                       — shared inline SVG icon set
+    RefugeeSupportAssistant.jsx    — main assistant chat interface
+    ChatInput.jsx                  — input, with document attach and voice input
+    chatService.js                 — chat client (RAG backend; mock fallback)
+    mockResponses.js               — offline mock responses (fallback)
+    MessageBubble.jsx              — chat message rendering
+    SourceCitation.jsx             — discreet "Verified · Source" badge
+    SafetyNotice.jsx               — safety disclaimer and escalation prompt
+    Selectors.jsx                  — ContextBar: compact location + language bar
+    SuggestedQuestions.jsx         — starter question prompts
+    speech.js                      — Web Speech API helpers (voice + read-aloud)
+    i18n.js                        — interface translations for all 6 languages
+    icons.jsx                      — shared inline SVG icon set
 ```
+
+## Getting started
+
+This frontend and the `backend/` RAG API run together.
+
+```bash
+# 1. Backend (translation + chat)
+cd backend
+cp .env.example .env        # set HF_TOKEN + LLM_PROVIDER for real generation
+npm install
+npm start                   # http://localhost:8787
+
+# 2. This frontend (in another terminal)
+cd data-ml
+npm install
+npm run dev                 # http://localhost:5174
+```
+
+To point the frontend at the backend, set in `data-ml/.env`:
+
+```
+VITE_USE_MOCK=false
+VITE_CHAT_API=http://localhost:8787/api/chat
+VITE_TRANSLATE_API=http://localhost:8787/api/translate
+```
+
+Without the backend, the assistant falls back to built-in mock responses
+(`VITE_USE_MOCK=true`), and document translation is unavailable.
 
 ## Known limitations
 
-- Somali and Kinyarwanda have no dedicated OCR trained-data model in Tesseract.js. Both are approximated using the English Latin-script model, which reads the correct letters but without language-specific word correction — extraction accuracy for these two languages will be lower than for English, Arabic, French, or Swahili. The extracted text box is editable so this can be corrected manually before translating.
-- Translation for Somali and Kinyarwanda routes through Hugging Face's hosted NLLB model, which may take 10–20 seconds to respond on first use after a period of inactivity, while the hosted model loads.
-- The MyMemory API's free tier has daily rate limits; production use at scale may warrant a dedicated translation provider.
-- The Refugee Support Assistant can run against the RAG backend (`backend/`, `POST /api/chat`) or fall back to built-in mock responses, controlled by `VITE_USE_MOCK` / `VITE_CHAT_API`.
+- **OCR for Somali & Kinyarwanda** has no dedicated Tesseract model; both use the
+  English Latin-script model, so accuracy is lower. The extracted-text box is
+  editable to correct this before translating.
+- **Somali & Kinyarwanda translations** (NLLB) and the **so/rw interface strings**
+  in `i18n.js` are machine-assisted and marked for **native-speaker review**
+  before production.
+- **Voice** works only in Chrome/Edge, and browser speech engines barely support
+  Somali/Kinyarwanda.
+- **MyMemory**'s free tier has daily rate limits; a dedicated provider may be
+  needed at scale.
 
 ## Roadmap
 
-- Replace `storage.js`'s localStorage logic with a persistent `document_scans` table once connected to a backend — no changes needed elsewhere in the feature
-- Expand analytics with breakdowns by document type or language pair
-- Rotate the Hugging Face token before any public deployment (a token was previously committed to git history; it now lives only in `backend/.env`)
-
-## Usage
-
-```
-npm install
-npm run dev
-```
-```
+- Verify the remaining generic knowledge-base entries (set `last_verified`).
+- Rotate the Hugging Face token before any public deployment (a token was once
+  committed to git history; it now lives only in `backend/.env`).
+- Persist scan analytics beyond localStorage once a datastore is available.
+- Native-speaker review of Somali/Kinyarwanda content.
