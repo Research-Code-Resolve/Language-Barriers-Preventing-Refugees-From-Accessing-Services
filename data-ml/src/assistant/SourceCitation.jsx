@@ -1,30 +1,25 @@
 import { theme } from '../theme';
 import { t } from './i18n';
+import { CheckIcon } from './icons';
 
-// Shows the "Verified information · Source" badge on human-verified answers.
+// Discreet inline "verified" line shown under human-verified answers — a small
+// check + muted text, no bordered pill, so it does not compete with the answer.
 export default function SourceCitation({ source, verified = false, language = 'en' }) {
   return (
     <div style={{
       display: 'inline-flex',
       alignItems: 'center',
-      gap: 6,
-      marginTop: 8,
-      padding: '4px 10px',
-      background: theme.white,
-      border: `1px solid ${verified ? theme.mint : theme.border}`,
-      borderRadius: 20,
-      fontSize: 11,
+      gap: 5,
+      marginTop: 6,
+      fontSize: 10.5,
+      lineHeight: 1.3,
       color: theme.textSecondary,
     }}>
-      <span style={{ fontWeight: 600, color: verified ? theme.blueDark : theme.textSecondary }}>
+      <CheckIcon width={12} height={12} style={{ color: theme.mint, flexShrink: 0 }} />
+      <span>
         {t('verified', language)}
+        {verified && source ? ` · ${source}` : ''}
       </span>
-      {verified && source && (
-        <>
-          <span style={{ color: theme.border }}>·</span>
-          <span>{t('source', language)}: {source}</span>
-        </>
-      )}
     </div>
   );
 }
