@@ -4,10 +4,13 @@ import ScanStats from './ScanStats';
 import RefugeeSupportAssistant from './assistant/RefugeeSupportAssistant';
 import { theme } from './theme';
 import { FileIcon } from './assistant/icons';
+import { t } from './assistant/i18n';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('scanner');
   const [pendingDocumentText, setPendingDocumentText] = useState('');
+  // Assistant language is lifted here so the top nav tabs localise with it.
+  const [language, setLanguage] = useState('en');
 
   const handleAskAIAboutDocument = useCallback((text) => {
     setPendingDocumentText(text);
@@ -20,6 +23,15 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: theme.bg, fontFamily: "'Segoe UI', sans-serif" }}>
+      {/* Visible keyboard-focus ring for accessibility (components use inline
+          styles, so this global rule provides the focus indicator). */}
+      <style>{`
+        :focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(65, 153, 203, 0.5);
+          border-radius: 8px;
+        }
+      `}</style>
       {/* Top navigation */}
       <nav style={{
         background: theme.white,
@@ -42,12 +54,12 @@ export default function App() {
             active={activeTab === 'scanner'}
             onClick={() => setActiveTab('scanner')}
             icon={<FileIcon width={18} height={18} />}
-            label="Document Scanner"
+            label={t('documentScanner', language)}
           />
           <TabButton
             active={activeTab === 'assistant'}
             onClick={() => setActiveTab('assistant')}
-            label="AI Assistant"
+            label={t('aiAssistant', language)}
           />
         </div>
       </nav>
@@ -65,6 +77,8 @@ export default function App() {
             pendingDocumentText={pendingDocumentText}
             onDocumentTextConsumed={handleDocumentTextConsumed}
             onNavigateScanner={() => setActiveTab('scanner')}
+            language={language}
+            setLanguage={setLanguage}
           />
         )}
       </div>

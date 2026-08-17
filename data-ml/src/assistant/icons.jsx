@@ -26,3 +26,5 @@ export const SparkleIcon = base(<><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12
 export const GlobeIcon = base(<><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></>);
 export const PinIcon = base(<><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></>);
 export const ArrowRightIcon = base(<><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></>);
+export const SpeakerIcon = base(<><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></>);
+export const StopIcon = base(<rect x="6" y="6" width="12" height="12" rx="2" />);

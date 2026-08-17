@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { theme } from '../theme';
-import { LocationSelector, LanguageSelector, ServiceSelector } from './Selectors';
+import { ContextBar } from './Selectors';
 import SuggestedQuestions from './SuggestedQuestions';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import { SafetyNotice, EscalationAlert } from './SafetyNotice';
 import { ArrowRightIcon, FileIcon } from './icons';
 import { sendChatMessage } from './chatService';
+import { t } from './i18n';
 import {
   getDocumentIntro,
   getDocumentActionResponse,
@@ -17,10 +18,8 @@ function formatTime(ts) {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumentTextConsumed, onNavigateScanner }) {
+export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumentTextConsumed, onNavigateScanner, language = 'en', setLanguage }) {
   const [location, setLocation] = useState('kakuma');
-  const [language, setLanguage] = useState('en');
-  const [serviceType, setServiceType] = useState('health');
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [showEscalation, setShowEscalation] = useState(false);
@@ -38,7 +37,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
         message: text,
         language,
         location,
-        serviceType,
+        serviceType: null,
         documentContext: documentText || null,
       });
       addMessage({
@@ -51,13 +50,13 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
     } catch {
       addMessage({
         role: 'assistant',
-        text: 'Sorry, I could not process your request right now. Please try again.',
+        text: t('error', language),
         isDemo: true,
         verified: false,
       });
     }
     setIsTyping(false);
-  }, [language, location, serviceType, documentText, addMessage]);
+  }, [language, location, documentText, addMessage]);
 
   const handleSend = useCallback((text) => {
     addMessage({ role: 'user', text });
@@ -129,7 +128,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: '0 auto', padding: '20px 16px', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div dir={language === 'ar' ? 'rtl' : 'ltr'} style={{ maxWidth: 520, margin: '0 auto', padding: '20px 16px', fontFamily: "'Segoe UI', sans-serif" }}>
       {/* Header */}
       <div style={{
         background: theme.white,
@@ -148,35 +147,24 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
             fontSize: 22,
             margin: 0,
           }}>
-            Refugee Support Assistant
+            {t('title', language)}
           </h2>
         </div>
         <p style={{ color: theme.textPrimary, fontSize: 14, fontWeight: 600, margin: 0 }}>
-          Get trusted help in your language for health and legal services.
+          {t('subtitle', language)}
         </p>
         <p style={{ color: theme.textSecondary, fontSize: 13, marginTop: 4 }}>
-          Ask questions, understand service information, and get guidance in your preferred language.
+          {t('intro', language)}
         </p>
       </div>
 
-      {/* Context selectors */}
-      <div style={{
-        background: theme.white,
-        borderRadius: 16,
-        padding: 20,
-        border: `1px solid ${theme.border}`,
-        boxShadow: theme.shadowSoft,
-        marginBottom: 16,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <LocationSelector value={location} onChange={setLocation} />
-          <LanguageSelector value={language} onChange={setLanguage} />
-        </div>
-        <ServiceSelector value={serviceType} onChange={setServiceType} />
-      </div>
+      {/* Compact, collapsible context bar (location + language) */}
+      <ContextBar
+        location={location}
+        setLocation={setLocation}
+        language={language}
+        setLanguage={setLanguage}
+      />
 
       {/* Chat area */}
       <div style={{
@@ -204,17 +192,17 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
               {/* Initial assistant greeting */}
               <MessageBubble message={{
                 role: 'assistant',
-                text: "Hello \u{1F44B} I'm here to help you understand health and legal services in your language. How can I help you today?",
-                isDemo: true,
+                text: t('greeting', language),
+                isDemo: false,
                 verified: false,
                 timestamp: formatTime(Date.now()),
-              }} />
-              <SuggestedQuestions onSelect={handleSuggestion} />
+              }} language={language} />
+              <SuggestedQuestions onSelect={handleSuggestion} language={language} />
             </>
           )}
 
           {messages.map((msg, i) => (
-            <MessageBubble key={i} message={msg} />
+            <MessageBubble key={i} message={msg} language={language} />
           ))}
 
           {/* Document action buttons */}
@@ -317,12 +305,13 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
           onSend={handleSend}
           onDocumentAttach={onNavigateScanner}
           disabled={isTyping}
+          language={language}
         />
       </div>
 
       {/* Safety notice */}
       <div style={{ marginTop: 12 }}>
-        <SafetyNotice />
+        <SafetyNotice language={language} />
       </div>
     </div>
   );

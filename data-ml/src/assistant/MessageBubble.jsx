@@ -1,9 +1,15 @@
 import { theme } from '../theme';
 import SourceCitation from './SourceCitation';
+import { SpeakerIcon } from './icons';
+import { speak, isSynthesisSupported } from './speech';
+import { t } from './i18n';
 
-export default function MessageBubble({ message }) {
+const RTL_LANGUAGES = ['ar'];
+
+export default function MessageBubble({ message, language = 'en' }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
+  const isRtl = RTL_LANGUAGES.includes(language);
 
   const bubbleStyle = isUser
     ? {
@@ -47,16 +53,40 @@ export default function MessageBubble({ message }) {
           lineHeight: 1.5,
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
+          direction: isRtl ? 'rtl' : 'ltr',
+          textAlign: isRtl ? 'right' : 'left',
         }}>
           {message.text}
         </div>
-        {isAssistant && message.source && (
-          <SourceCitation source={message.source} verified={message.verified === true} />
+        {isAssistant && isSynthesisSupported() && (
+          <button
+            type="button"
+            onClick={() => speak(message.text, language)}
+            title="Read aloud"
+            aria-label="Read message aloud"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              marginTop: 6,
+              padding: '3px 10px',
+              background: theme.white,
+              border: `1px solid ${theme.border}`,
+              borderRadius: 20,
+              fontSize: 11,
+              fontWeight: 600,
+              color: theme.blue,
+              cursor: 'pointer',
+            }}
+          >
+            <SpeakerIcon width={13} height={13} />
+            {t('listen', language)}
+          </button>
         )}
-        {isAssistant && message.isDemo && !message.source && (
-          <p style={{ fontSize: 11, color: theme.textSecondary, marginTop: 4, fontStyle: 'italic' }}>
-            Demo response — will be replaced with verified RAG-backed answers.
-          </p>
+        {/* Only show the trust badge for human-verified answers. Unverified
+            answers show no label (rather than a "Demo response" tag). */}
+        {isAssistant && message.verified === true && message.source && (
+          <SourceCitation source={message.source} verified={true} language={language} />
         )}
         {message.timestamp && (
           <p style={{

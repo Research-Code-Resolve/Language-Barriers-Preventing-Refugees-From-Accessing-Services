@@ -1,0 +1,6 @@
+# Microsoft Office temporary lock files
+~$*
+
+# Environment files (also covered per-package, kept here as a safety net)
+.env
+.env.local

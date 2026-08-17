@@ -13,8 +13,13 @@
 
 import { getAssistantResponse } from './mockResponses';
 
-const API_ENDPOINT = '/api/chat';
-const USE_MOCK = true; // Set to false when the real backend is available
+// Endpoint of the RAG backend. Defaults to same-origin /api/chat; override with
+// VITE_CHAT_API (e.g. http://localhost:8787/api/chat during local development).
+const API_ENDPOINT = import.meta.env.VITE_CHAT_API || '/api/chat';
+
+// Mock stays ON by default so the app runs standalone. Set VITE_USE_MOCK=false
+// (with the backend running) to route messages to the real RAG pipeline.
+const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
 
 export async function sendChatMessage({ message, language, location, serviceType, documentContext = null }) {
   if (USE_MOCK) {
