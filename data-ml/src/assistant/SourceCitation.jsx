@@ -1,9 +1,8 @@
 import { theme } from '../theme';
+import { t } from './i18n';
 
-// Reusable source citation component.
-// When `verified` is true (future RAG backend), shows "Verified information" with the source.
-// When `verified` is false (current demo), shows "Demo response" instead.
-export default function SourceCitation({ source, verified = false }) {
+// Shows the "Verified information · Source" badge on human-verified answers.
+export default function SourceCitation({ source, verified = false, language = 'en' }) {
   return (
     <div style={{
       display: 'inline-flex',
@@ -17,16 +16,13 @@ export default function SourceCitation({ source, verified = false }) {
       fontSize: 11,
       color: theme.textSecondary,
     }}>
-      <span style={{
-        fontWeight: 600,
-        color: verified ? theme.blueDark : theme.textSecondary,
-      }}>
-        {verified ? 'Verified information' : 'Demo response'}
+      <span style={{ fontWeight: 600, color: verified ? theme.blueDark : theme.textSecondary }}>
+        {t('verified', language)}
       </span>
       {verified && source && (
         <>
           <span style={{ color: theme.border }}>·</span>
-          <span>Source: {source}</span>
+          <span>{t('source', language)}: {source}</span>
         </>
       )}
     </div>

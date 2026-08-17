@@ -7,6 +7,7 @@ import ChatInput from './ChatInput';
 import { SafetyNotice, EscalationAlert } from './SafetyNotice';
 import { ArrowRightIcon, FileIcon } from './icons';
 import { sendChatMessage } from './chatService';
+import { t } from './i18n';
 import {
   getDocumentIntro,
   getDocumentActionResponse,
@@ -50,7 +51,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
     } catch {
       addMessage({
         role: 'assistant',
-        text: 'Sorry, I could not process your request right now. Please try again.',
+        text: t('error', language),
         isDemo: true,
         verified: false,
       });
@@ -128,7 +129,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: '0 auto', padding: '20px 16px', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div dir={language === 'ar' ? 'rtl' : 'ltr'} style={{ maxWidth: 520, margin: '0 auto', padding: '20px 16px', fontFamily: "'Segoe UI', sans-serif" }}>
       {/* Header */}
       <div style={{
         background: theme.white,
@@ -147,14 +148,14 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
             fontSize: 22,
             margin: 0,
           }}>
-            Refugee Support Assistant
+            {t('title', language)}
           </h2>
         </div>
         <p style={{ color: theme.textPrimary, fontSize: 14, fontWeight: 600, margin: 0 }}>
-          Get trusted help in your language for health and legal services.
+          {t('subtitle', language)}
         </p>
         <p style={{ color: theme.textSecondary, fontSize: 13, marginTop: 4 }}>
-          Ask questions, understand service information, and get guidance in your preferred language.
+          {t('intro', language)}
         </p>
       </div>
 
@@ -192,12 +193,12 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
               {/* Initial assistant greeting */}
               <MessageBubble message={{
                 role: 'assistant',
-                text: "Hello \u{1F44B} I'm here to help you understand health and legal services in your language. How can I help you today?",
+                text: t('greeting', language),
                 isDemo: false,
                 verified: false,
                 timestamp: formatTime(Date.now()),
               }} language={language} />
-              <SuggestedQuestions onSelect={handleSuggestion} />
+              <SuggestedQuestions onSelect={handleSuggestion} language={language} />
             </>
           )}
 
@@ -311,7 +312,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
 
       {/* Safety notice */}
       <div style={{ marginTop: 12 }}>
-        <SafetyNotice />
+        <SafetyNotice language={language} />
       </div>
     </div>
   );

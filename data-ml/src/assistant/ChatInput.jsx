@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { theme } from '../theme';
 import { SendIcon, MicIcon, FileIcon } from './icons';
 import { createRecognition, isRecognitionSupported } from './speech';
+import { t } from './i18n';
 
 const MAX_INPUT_HEIGHT = 150;
 
@@ -106,8 +107,8 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
         ref={textareaRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={isListening ? 'Listening…' : 'Type your question here...'}
-        aria-label="Type your question"
+        placeholder={isListening ? t('listening', language) : t('inputPlaceholder', language)}
+        aria-label={t('inputPlaceholder', language)}
         rows={1}
         dir={language === 'ar' ? 'rtl' : 'ltr'}
         onKeyDown={(e) => {

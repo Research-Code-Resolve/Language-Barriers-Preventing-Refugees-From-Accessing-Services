@@ -2,6 +2,7 @@ import { theme } from '../theme';
 import SourceCitation from './SourceCitation';
 import { SpeakerIcon } from './icons';
 import { speak, isSynthesisSupported } from './speech';
+import { t } from './i18n';
 
 const RTL_LANGUAGES = ['ar'];
 
@@ -79,13 +80,13 @@ export default function MessageBubble({ message, language = 'en' }) {
             }}
           >
             <SpeakerIcon width={13} height={13} />
-            Listen
+            {t('listen', language)}
           </button>
         )}
         {/* Only show the trust badge for human-verified answers. Unverified
             answers show no label (rather than a "Demo response" tag). */}
         {isAssistant && message.verified === true && message.source && (
-          <SourceCitation source={message.source} verified={true} />
+          <SourceCitation source={message.source} verified={true} language={language} />
         )}
         {message.timestamp && (
           <p style={{

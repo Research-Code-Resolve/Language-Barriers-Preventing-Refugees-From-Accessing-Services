@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { theme, LANGUAGES, LOCATIONS } from '../theme';
 import { GlobeIcon, PinIcon } from './icons';
+import { t } from './i18n';
 
 const compactSelect = {
   padding: '7px 10px',
@@ -59,9 +60,9 @@ export function ContextBar({ location, setLocation, language, setLanguage }) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          style={{ marginLeft: 'auto', background: 'none', border: 'none', color: theme.blue, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+          style={{ marginInlineStart: 'auto', background: 'none', border: 'none', color: theme.blue, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
         >
-          Change
+          {t('change', language)}
         </button>
       </div>
     );
@@ -71,22 +72,22 @@ export function ContextBar({ location, setLocation, language, setLanguage }) {
     <div style={barStyle}>
       <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
         <PinIcon width={14} height={14} style={{ color: theme.blue }} />
-        <select aria-label="Your location" value={location} onChange={(e) => setLocation(e.target.value)} style={compactSelect}>
+        <select aria-label={t('yourLocation', language)} value={location} onChange={(e) => setLocation(e.target.value)} style={compactSelect}>
           {LOCATIONS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
         </select>
       </label>
       <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
         <GlobeIcon width={14} height={14} style={{ color: theme.blue }} />
-        <select aria-label="Preferred language" value={language} onChange={(e) => setLanguage(e.target.value)} style={compactSelect}>
+        <select aria-label={t('preferredLanguage', language)} value={language} onChange={(e) => setLanguage(e.target.value)} style={compactSelect}>
           {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
         </select>
       </label>
       <button
         type="button"
         onClick={() => setOpen(false)}
-        style={{ marginLeft: 'auto', background: theme.gradient, color: theme.white, border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+        style={{ marginInlineStart: 'auto', background: theme.gradient, color: theme.white, border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
       >
-        Done
+        {t('done', language)}
       </button>
     </div>
   );

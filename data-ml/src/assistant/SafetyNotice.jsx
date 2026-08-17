@@ -1,7 +1,8 @@
 import { theme } from '../theme';
 import { AlertIcon } from './icons';
+import { t } from './i18n';
 
-export function SafetyNotice() {
+export function SafetyNotice({ language = 'en' }) {
   return (
     <p style={{
       fontSize: 11,
@@ -10,8 +11,7 @@ export function SafetyNotice() {
       lineHeight: 1.5,
       padding: '0 12px',
     }}>
-      This assistant provides information and guidance. It does not replace qualified
-      healthcare professionals, legal professionals, or professional interpreters.
+      {t('safety', language)}
     </p>
   );
 }
