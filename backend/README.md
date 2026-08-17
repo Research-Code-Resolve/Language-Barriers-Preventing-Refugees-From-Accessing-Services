@@ -58,7 +58,7 @@ Set `LLM_PROVIDER` in `.env` (see `.env.example`):
 |---|---|
 | `huggingface` | Open-source model hosted on HF. **Recommended** — no local hardware, model runs in the cloud. Needs `HF_TOKEN`. |
 | `ollama` | Same class of open-source model, running locally (offline, no key, needs a capable machine). |
-| `anthropic` / `openai` | Hosted commercial APIs (need a key). Any OpenAI-compatible endpoint works via `OPENAI_BASE_URL`. |
+| `openai` | Hosted OpenAI-compatible API (needs a key). Any OpenAI-compatible endpoint — Groq, Together, self-hosted vLLM — works via `OPENAI_BASE_URL`. |
 | `none` | Extractive mode — returns the top KB answer, no generation. Runs with nothing installed. |
 
 The default model is `Qwen/Qwen2.5-7B-Instruct` (good multilingual coverage).

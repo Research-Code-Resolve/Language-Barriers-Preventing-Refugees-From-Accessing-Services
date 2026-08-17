@@ -7,7 +7,7 @@
 //                 runs in the cloud, the refugee's device only runs a browser.
 //   ollama      — the same class of open-source model, but running LOCALLY via
 //                 Ollama. No key, works offline, but needs a capable machine.
-//   anthropic / openai — hosted commercial APIs (need a key).
+//   openai      — hosted OpenAI-compatible API (needs a key).
 //   none        — or a failed/absent provider — runs in EXTRACTIVE mode: no
 //                 generation, just returns the top knowledge-base answer, so
 //                 the pipeline stays demonstrable with nothing installed.
@@ -21,28 +21,6 @@ const MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
 const OLLAMA_URL = (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '');
 const OPENAI_BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
 const HF_BASE_URL = (process.env.HF_BASE_URL || 'https://router.huggingface.co/v1').replace(/\/$/, '');
-
-async function callAnthropic({ system, user }) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 600,
-      system,
-      messages: [{ role: 'user', content: user }],
-    }),
-  });
-  if (!res.ok) {
-    throw new Error(`Anthropic API error ${res.status}: ${await res.text()}`);
-  }
-  const data = await res.json();
-  return data.content?.map((b) => b.text).join('').trim() || '';
-}
 
 // Open-source model hosted on the Hugging Face Inference API (OpenAI-compatible
 // "router" endpoint). The model runs in the cloud — no local hardware needed.
@@ -127,7 +105,6 @@ function extractiveAnswer(entries) {
 export async function generateAnswer({ system, user, entries }) {
   const hasHuggingFace = PROVIDER === 'huggingface' && process.env.HF_TOKEN;
   const isOllama = PROVIDER === 'ollama';
-  const hasAnthropic = PROVIDER === 'anthropic' && process.env.ANTHROPIC_API_KEY;
   const hasOpenAI = PROVIDER === 'openai' && process.env.OPENAI_API_KEY;
 
   try {
@@ -136,9 +113,6 @@ export async function generateAnswer({ system, user, entries }) {
     }
     if (isOllama) {
       return { text: await callOllama({ system, user }), mode: 'generated' };
-    }
-    if (hasAnthropic) {
-      return { text: await callAnthropic({ system, user }), mode: 'generated' };
     }
     if (hasOpenAI) {
       return { text: await callOpenAI({ system, user }), mode: 'generated' };
