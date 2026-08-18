@@ -8,6 +8,7 @@ import {
   Scale,
   User,
   Check,
+  FileText,
 } from "lucide-react";
 
 export default function ServiceSelectionPage() {
@@ -17,7 +18,11 @@ export default function ServiceSelectionPage() {
   const handleSelect = (serviceType) => {
     setSelectedService(serviceType);
     setTimeout(() => {
-      navigate(`/voice-translation?service=${serviceType}`);
+      if (serviceType === "tools") {
+        navigate("/tools");
+      } else {
+        navigate(`/voice-translation?service=${serviceType}`);
+      }
     }, 250);
   };
 
@@ -30,14 +35,12 @@ export default function ServiceSelectionPage() {
         >
           <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
-
         <img
           src="/semasasa-logo.png"
           alt="SemaSasa Logo"
           className="h-8 sm:h-10 w-auto object-contain cursor-pointer"
           onClick={() => navigate("/")}
         />
-
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/settings")}
@@ -50,7 +53,6 @@ export default function ServiceSelectionPage() {
           </div>
         </div>
       </header>
-
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 sm:py-16 flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3">
           How can we help today?
@@ -58,8 +60,7 @@ export default function ServiceSelectionPage() {
         <p className="text-sm sm:text-base text-gray-600 max-w-xl mb-10 sm:mb-14">
           Select a service context to connect with a specialized interpreter.
         </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 w-full max-w-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 w-full max-w-4xl">
           <div
             onClick={() => handleSelect("health")}
             className={`bg-white p-8 sm:p-10 rounded-3xl border transition-all cursor-pointer flex flex-col items-center text-center relative ${
@@ -84,7 +85,6 @@ export default function ServiceSelectionPage() {
               hospital appointments.
             </p>
           </div>
-
           <div
             onClick={() => handleSelect("legal")}
             className={`bg-white p-8 sm:p-10 rounded-3xl border transition-all cursor-pointer flex flex-col items-center text-center relative ${
@@ -109,9 +109,32 @@ export default function ServiceSelectionPage() {
               document translation.
             </p>
           </div>
+          <div
+            onClick={() => handleSelect("tools")}
+            className={`bg-white p-8 sm:p-10 rounded-3xl border transition-all cursor-pointer flex flex-col items-center text-center relative ${
+              selectedService === "tools"
+                ? "border-[#2B8B7B] ring-2 ring-[#2B8B7B] shadow-lg scale-[1.02]"
+                : "border-gray-100 shadow-sm hover:shadow-md hover:border-teal-200"
+            }`}
+          >
+            {selectedService === "tools" && (
+              <div className="absolute top-4 right-4 bg-[#2B8B7B] text-white p-1 rounded-full">
+                <Check className="w-4 h-4" />
+              </div>
+            )}
+            <div className="w-20 h-20 bg-[#C6F3ED] rounded-full flex items-center justify-center mb-6">
+              <FileText className="w-10 h-10 text-[#2B8B7B]" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              Document Scanner &amp; Assistant
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Scan and translate documents, and ask questions in your own
+              language.
+            </p>
+          </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

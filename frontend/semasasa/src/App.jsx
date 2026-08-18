@@ -9,6 +9,7 @@ import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import ProtectedRoute from "./ProtectedRoute";
+import DocumentToolsPage from "./scanner-assistant/DocumentToolsPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/select-service" element={<ServiceSelectionPage />} />
       <Route path="/voice-translation" element={<VoiceTranslationPage />} />
       <Route path="/request-interpreter" element={<RequestInterpreterPage />} />
+      <Route path="/tools" element={<DocumentToolsPage />} />
       <Route
 
         path="/login"
