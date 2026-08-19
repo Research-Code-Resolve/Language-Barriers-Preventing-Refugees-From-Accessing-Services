@@ -8,7 +8,9 @@ import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const DEFAULT_KB_PATH = resolve(__dirname, '../../knowledge_base/refugee_knowledge_base.csv');
+const DEFAULT_KB_PATH = resolve(__dirname, '../knowledge_base/refugee_knowledge_base.csv');
+console.log('[debug] __dirname is:', __dirname);
+console.log('[debug] DEFAULT_KB_PATH is:', DEFAULT_KB_PATH);
 
 // Parse a full CSV string into an array of row-arrays.
 function parseCsv(text) {
