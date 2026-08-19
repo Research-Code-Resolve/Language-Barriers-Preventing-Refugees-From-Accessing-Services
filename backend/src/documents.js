@@ -13,7 +13,7 @@ import mammoth from 'mammoth';
 import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DEFAULT_DOCS_DIR = resolve(__dirname, '../../knowledge_base/documents');
+const DEFAULT_DOCS_DIR = resolve(__dirname, '../knowledge_base/documents');
 
 // Roughly map a source filename to one of the app's known locations so the
 // location filter still works on document passages.
