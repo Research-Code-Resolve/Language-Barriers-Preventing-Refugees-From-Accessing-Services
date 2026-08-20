@@ -16,7 +16,10 @@
 // works through the "openai" provider by setting OPENAI_BASE_URL.
 
 const PROVIDER = (process.env.LLM_PROVIDER || 'none').toLowerCase();
-const MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
+// Default served by the Hugging Face router. NB: a model must be enabled by a
+// provider on the HF account — e.g. Qwen/Qwen2.5-7B-Instruct is currently NOT
+// served and returns 400, so it cannot be the default.
+const MODEL = process.env.LLM_MODEL || 'meta-llama/Llama-3.1-8B-Instruct';
 
 const OLLAMA_URL = (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '');
 const OPENAI_BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
