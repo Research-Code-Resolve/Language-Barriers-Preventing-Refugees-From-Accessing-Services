@@ -12,14 +12,14 @@ import {
   User,
   ArrowRightLeft,
 } from "lucide-react";
+import { translateText } from "../scanner-assistant/translate";
 
 const LANGUAGES = [
   { code: "sw", name: "Swahili", speechLang: "sw-KE" },
   { code: "ar", name: "Arabic", speechLang: "ar-SA" },
   { code: "fr", name: "French", speechLang: "fr-FR" },
   { code: "so", name: "Somali", speechLang: "so-SO" },
-  { code: "es", name: "Spanish", speechLang: "es-ES" },
-  { code: "am", name: "Amharic", speechLang: "am-ET" },
+  { code: "rw", name: "Kinyarwanda", speechLang: "rw-RW" },
 ];
 
 export default function VoiceTranslationPage() {
@@ -41,15 +41,21 @@ export default function VoiceTranslationPage() {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
+    console.log("[debug] SpeechRecognition supported:", !!SpeechRecognition);
+
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
 
+      recognition.onstart = () => {
+        console.log("[debug] recognition started");
+      };
+
       recognition.onresult = async (event) => {
         const transcript = event.results[0][0].transcript;
+        console.log("[debug] Heard:", transcript);
         setIsListening(false);
-
         if (activeSpeaker === "provider") {
           setProviderText(transcript);
           await translateAndSpeak(
@@ -71,12 +77,14 @@ export default function VoiceTranslationPage() {
         }
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (event) => {
+        console.error("[debug] Speech recognition error:", event.error);
         setIsListening(false);
         setActiveSpeaker(null);
       };
 
       recognition.onend = () => {
+        console.log("[debug] recognition ended");
         setIsListening(false);
       };
 
@@ -85,18 +93,17 @@ export default function VoiceTranslationPage() {
   }, [activeSpeaker, refugeeLang]);
 
   const startListening = (speaker) => {
+    console.log("[debug] startListening called for:", speaker);
     if (!recognitionRef.current) {
       alert("Speech recognition is not supported in this browser.");
       return;
     }
-
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
       setActiveSpeaker(null);
       return;
     }
-
     setActiveSpeaker(speaker);
     recognitionRef.current.lang =
       speaker === "provider" ? "en-US" : refugeeLang.speechLang;
@@ -111,40 +118,43 @@ export default function VoiceTranslationPage() {
     ttsLang,
     targetCard,
   ) => {
+    console.log("[debug] translateAndSpeak called:", { text, sourceLang, targetLang });
     try {
-      const res = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-          text,
-        )}&langpair=${sourceLang}|${targetLang}`,
-      );
-      const data = await res.json();
-      const resultText = data.responseData.translatedText || text;
-
+      const resultText = await translateText(text, sourceLang, targetLang);
+      console.log("[debug] translation result:", resultText);
+      const finalText = resultText || text;
       if (targetCard === "refugee") {
-        setTranslatedRefugeeText(resultText);
+        setTranslatedRefugeeText(finalText);
       } else {
-        setTranslatedProviderText(resultText);
+        setTranslatedProviderText(finalText);
       }
-
-      speakText(resultText, ttsLang);
-    } catch {
+      speakText(finalText, ttsLang);
+    } catch (err) {
+      console.error("[debug] Translation failed:", err);
       if (targetCard === "refugee") {
         setTranslatedRefugeeText(text);
       } else {
         setTranslatedProviderText(text);
       }
+      speakText(text, ttsLang);
     }
   };
 
   const speakText = (text, lang) => {
+    console.log("[debug] speakText called:", { text, lang });
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
+      utterance.onstart = () => console.log("[debug] speech started");
+      utterance.onerror = (e) => console.error("[debug] speech error:", e.error);
       utterance.onend = () => {
+        console.log("[debug] speech ended");
         setActiveSpeaker(null);
       };
       window.speechSynthesis.speak(utterance);
+    } else {
+      console.error("[debug] speechSynthesis not supported in this browser");
     }
   };
 
@@ -165,7 +175,6 @@ export default function VoiceTranslationPage() {
             onClick={() => navigate("/")}
           />
         </div>
-
         <div className="inline-flex items-center gap-2 bg-[#E6F7F4] text-[#2B8B7B] px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border border-[#C6F3ED]">
           {serviceType === "health" ? (
             <>
@@ -179,7 +188,6 @@ export default function VoiceTranslationPage() {
             </>
           )}
         </div>
-
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/settings")}
@@ -204,9 +212,7 @@ export default function VoiceTranslationPage() {
                 English
               </span>
             </div>
-
             <ArrowRightLeft className="w-4 h-4 text-gray-400 mx-2" />
-
             <div className="text-center sm:text-left">
               <span className="text-xs text-gray-400 block font-medium">
                 Refugee
@@ -229,7 +235,6 @@ export default function VoiceTranslationPage() {
               </select>
             </div>
           </div>
-
           <div className="text-xs text-gray-500 bg-slate-50 px-3 py-1.5 rounded-full border border-gray-100">
             Real-time Voice Translation Ready
           </div>
@@ -252,7 +257,6 @@ export default function VoiceTranslationPage() {
               </div>
               <span className="text-xs text-gray-400 font-medium">English</span>
             </div>
-
             <div className="space-y-4 pt-2">
               <div className="min-h-[60px]">
                 <p className="text-xs text-gray-400 font-medium mb-1">
@@ -262,7 +266,6 @@ export default function VoiceTranslationPage() {
                   {providerText || "Tap the microphone and speak..."}
                 </p>
               </div>
-
               {translatedRefugeeText && (
                 <div className="bg-[#E6F7F4]/60 p-4 rounded-2xl border border-[#C6F3ED] mt-4">
                   <p className="text-xs text-[#2B8B7B] font-semibold mb-1">
@@ -275,7 +278,6 @@ export default function VoiceTranslationPage() {
               )}
             </div>
           </div>
-
           <div className="flex flex-col items-center pt-6">
             {activeSpeaker === "provider" && isListening && (
               <div className="flex items-center gap-1 mb-3">
@@ -321,7 +323,6 @@ export default function VoiceTranslationPage() {
                 {refugeeLang.name}
               </span>
             </div>
-
             <div className="space-y-4 pt-2">
               <div className="min-h-[60px]">
                 <p className="text-xs text-gray-400 font-medium mb-1">
@@ -332,7 +333,6 @@ export default function VoiceTranslationPage() {
                     `Tap microphone to record ${refugeeLang.name}...`}
                 </p>
               </div>
-
               {translatedProviderText && (
                 <div className="bg-sky-50 p-4 rounded-2xl border border-sky-100 mt-4">
                   <p className="text-xs text-[#4895D0] font-semibold mb-1">
@@ -345,7 +345,6 @@ export default function VoiceTranslationPage() {
               )}
             </div>
           </div>
-
           <div className="flex flex-col items-center pt-6">
             {activeSpeaker === "refugee" && isListening && (
               <div className="flex items-center gap-1 mb-3">
@@ -381,7 +380,6 @@ export default function VoiceTranslationPage() {
           <Headphones className="w-5 h-5" />
           Request Human Interpreter
         </button>
-
         <button
           onClick={() => navigate("/select-service")}
           className="w-full sm:w-auto bg-red-50 hover:bg-red-100 text-red-600 px-6 py-3 rounded-full font-medium flex items-center justify-center gap-2 border border-red-100 transition-all"
