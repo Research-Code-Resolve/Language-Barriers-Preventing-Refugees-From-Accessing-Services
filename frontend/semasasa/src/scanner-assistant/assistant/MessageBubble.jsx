@@ -6,7 +6,7 @@ import { t } from './i18n';
 
 const RTL_LANGUAGES = ['ar'];
 
-export default function MessageBubble({ message, language = 'en' }) {
+export default function MessageBubble({ message, language = 'en', onEdit }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
   const isRtl = RTL_LANGUAGES.includes(language);
@@ -58,6 +58,27 @@ export default function MessageBubble({ message, language = 'en' }) {
         }}>
           {message.text}
         </div>
+        {isUser && onEdit && (
+          <div style={{ textAlign: 'right', marginTop: 3 }}>
+            <button
+              type="button"
+              onClick={() => onEdit(message.text)}
+              title={t('edit', language)}
+              aria-label={t('edit', language)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: theme.textSecondary,
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: 'pointer',
+                padding: '2px 4px',
+              }}
+            >
+              {t('edit', language)}
+            </button>
+          </div>
+        )}
         {isAssistant && isSynthesisSupported() && (
           <button
             type="button"

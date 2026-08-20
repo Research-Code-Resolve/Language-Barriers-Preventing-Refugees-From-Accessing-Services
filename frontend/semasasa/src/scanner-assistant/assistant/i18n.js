@@ -8,6 +8,8 @@ export const STRINGS = {
   en: {
     documentScanner: 'Document Scanner',
     aiAssistant: 'AI Assistant',
+    home: 'Home',
+    edit: 'Edit',
     title: 'Refugee Support Assistant',
     subtitle: 'Get trusted help in your language for health and legal services.',
     intro: 'Ask questions, understand service information, and get guidance in your preferred language.',
@@ -32,6 +34,8 @@ export const STRINGS = {
   fr: {
     documentScanner: 'Scanner de documents',
     aiAssistant: 'Assistant IA',
+    home: 'Accueil',
+    edit: 'Modifier',
     title: "Assistant d'aide aux réfugiés",
     subtitle: 'Obtenez une aide fiable dans votre langue pour les services de santé et juridiques.',
     intro: 'Posez des questions, comprenez les informations sur les services et recevez des conseils dans votre langue.',
@@ -56,6 +60,8 @@ export const STRINGS = {
   ar: {
     documentScanner: 'ماسح المستندات',
     aiAssistant: 'المساعد الذكي',
+    home: 'الرئيسية',
+    edit: 'تعديل',
     title: 'مساعد دعم اللاجئين',
     subtitle: 'احصل على مساعدة موثوقة بلغتك للخدمات الصحية والقانونية.',
     intro: 'اطرح الأسئلة، وافهم معلومات الخدمات، واحصل على التوجيه بلغتك المفضلة.',
@@ -80,6 +86,8 @@ export const STRINGS = {
   sw: {
     documentScanner: 'Kichanganuzi cha Hati',
     aiAssistant: 'Msaidizi wa AI',
+    home: 'Mwanzo',
+    edit: 'Hariri',
     title: 'Msaidizi wa Wakimbizi',
     subtitle: 'Pata msaada wa kuaminika katika lugha yako kwa huduma za afya na kisheria.',
     intro: 'Uliza maswali, elewa taarifa za huduma, na upate mwongozo katika lugha unayopendelea.',
@@ -105,6 +113,8 @@ export const STRINGS = {
   so: {
     documentScanner: 'Iskaanka Dukumeentiga',
     aiAssistant: 'Kaaliyaha AI',
+    home: 'Bogga hore',
+    edit: 'Wax ka beddel',
     title: 'Kaaliyaha Taageerada Qaxootiga',
     subtitle: 'Hel caawimaad la aamin karo oo luqaddaada ku ah adeegyada caafimaad iyo sharci.',
     intro: "Weydii su'aalo, faham macluumaadka adeegyada, oo hel hagitaan luqaddaada aad doorbidayso.",
@@ -130,6 +140,8 @@ export const STRINGS = {
   rw: {
     documentScanner: "Isikana ry'Inyandiko",
     aiAssistant: 'Umufasha wa AI',
+    home: 'Ahabanza',
+    edit: 'Hindura',
     title: "Umufasha w'Impunzi",
     subtitle: "Bona ubufasha bwizewe mu rurimi rwawe ku byerekeye serivisi z'ubuzima n'amategeko.",
     intro: 'Baza ibibazo, sobanukirwa amakuru ya serivisi, kandi ubone ubuyobozi mu rurimi ukunda.',

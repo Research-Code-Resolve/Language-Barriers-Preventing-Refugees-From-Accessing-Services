@@ -20,6 +20,8 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
   const [isTyping, setIsTyping] = useState(false);
   const [showEscalation, setShowEscalation] = useState(false);
   const [documentText, setDocumentText] = useState('');
+  // A sent message the user chose to edit — loaded back into the input.
+  const [prefill, setPrefill] = useState(null);
   const scrollRef = useRef(null);
 
   const addMessage = useCallback((msg) => {
@@ -63,6 +65,12 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
     addMessage({ role: 'user', text: q });
     sendAssistantMessage(q);
   }, [addMessage, sendAssistantMessage]);
+
+  // Load a previously sent message back into the input so the user can edit and
+  // resend it. New object identity each time so re-editing the same text works.
+  const handleEditMessage = useCallback((text) => {
+    setPrefill({ text, n: Date.now() });
+  }, []);
 
   // Receive document text from Document Scanner
   useEffect(() => {
@@ -204,7 +212,12 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
           )}
 
           {messages.map((msg, i) => (
-            <MessageBubble key={i} message={msg} language={language} />
+            <MessageBubble
+              key={i}
+              message={msg}
+              language={language}
+              onEdit={msg.role === 'user' ? handleEditMessage : undefined}
+            />
           ))}
 
           {/* Document action buttons */}
@@ -308,6 +321,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
           onDocumentAttach={onNavigateScanner}
           disabled={isTyping}
           language={language}
+          prefill={prefill}
         />
       </div>
 
