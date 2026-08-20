@@ -36,64 +36,61 @@ export default function VoiceTranslationPage() {
   const [translatedProviderText, setTranslatedProviderText] = useState("");
 
   const recognitionRef = useRef(null);
+  // Refs mirror the current speaker/language so the recognition handler — which
+  // is created only once — always reads the latest value instead of a stale
+  // closure. Without this, the first tap was lost and users had to tap twice.
+  const activeSpeakerRef = useRef(null);
+  const refugeeLangRef = useRef(refugeeLang);
+
+  useEffect(() => {
+    activeSpeakerRef.current = activeSpeaker;
+  }, [activeSpeaker]);
+
+  useEffect(() => {
+    refugeeLangRef.current = refugeeLang;
+  }, [refugeeLang]);
 
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    console.log("[debug] SpeechRecognition supported:", !!SpeechRecognition);
+    if (!SpeechRecognition) return;
 
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-      recognition.onstart = () => {
-        console.log("[debug] recognition started");
-      };
+    recognition.onresult = async (event) => {
+      const transcript = event.results[0][0].transcript;
+      setIsListening(false);
 
-      recognition.onresult = async (event) => {
-        const transcript = event.results[0][0].transcript;
-        console.log("[debug] Heard:", transcript);
-        setIsListening(false);
-        if (activeSpeaker === "provider") {
-          setProviderText(transcript);
-          await translateAndSpeak(
-            transcript,
-            "en",
-            refugeeLang.code,
-            refugeeLang.speechLang,
-            "refugee",
-          );
-        } else if (activeSpeaker === "refugee") {
-          setRefugeeText(transcript);
-          await translateAndSpeak(
-            transcript,
-            refugeeLang.code,
-            "en",
-            "en-US",
-            "provider",
-          );
-        }
-      };
+      const speaker = activeSpeakerRef.current;
+      const lang = refugeeLangRef.current;
 
-      recognition.onerror = (event) => {
-        console.error("[debug] Speech recognition error:", event.error);
-        setIsListening(false);
-        setActiveSpeaker(null);
-      };
+      if (speaker === "provider") {
+        setProviderText(transcript);
+        await translateAndSpeak(transcript, "en", lang.code, lang.speechLang, "refugee");
+      } else if (speaker === "refugee") {
+        setRefugeeText(transcript);
+        await translateAndSpeak(transcript, lang.code, "en", "en-US", "provider");
+      }
+    };
 
-      recognition.onend = () => {
-        console.log("[debug] recognition ended");
-        setIsListening(false);
-      };
+    recognition.onerror = () => {
+      setIsListening(false);
+      setActiveSpeaker(null);
+    };
 
-      recognitionRef.current = recognition;
-    }
-  }, [activeSpeaker, refugeeLang]);
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    // Created once — the handler reads the refs above for current state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const startListening = (speaker) => {
-    console.log("[debug] startListening called for:", speaker);
     if (!recognitionRef.current) {
       alert("Speech recognition is not supported in this browser.");
       return;
@@ -102,8 +99,11 @@ export default function VoiceTranslationPage() {
       recognitionRef.current.stop();
       setIsListening(false);
       setActiveSpeaker(null);
+      activeSpeakerRef.current = null;
       return;
     }
+    // Set the ref synchronously so the very first tap is handled correctly.
+    activeSpeakerRef.current = speaker;
     setActiveSpeaker(speaker);
     recognitionRef.current.lang =
       speaker === "provider" ? "en-US" : refugeeLang.speechLang;
@@ -118,10 +118,8 @@ export default function VoiceTranslationPage() {
     ttsLang,
     targetCard,
   ) => {
-    console.log("[debug] translateAndSpeak called:", { text, sourceLang, targetLang });
     try {
       const resultText = await translateText(text, sourceLang, targetLang);
-      console.log("[debug] translation result:", resultText);
       const finalText = resultText || text;
       if (targetCard === "refugee") {
         setTranslatedRefugeeText(finalText);
@@ -129,8 +127,7 @@ export default function VoiceTranslationPage() {
         setTranslatedProviderText(finalText);
       }
       speakText(finalText, ttsLang);
-    } catch (err) {
-      console.error("[debug] Translation failed:", err);
+    } catch {
       if (targetCard === "refugee") {
         setTranslatedRefugeeText(text);
       } else {
@@ -141,20 +138,15 @@ export default function VoiceTranslationPage() {
   };
 
   const speakText = (text, lang) => {
-    console.log("[debug] speakText called:", { text, lang });
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
-      utterance.onstart = () => console.log("[debug] speech started");
-      utterance.onerror = (e) => console.error("[debug] speech error:", e.error);
       utterance.onend = () => {
-        console.log("[debug] speech ended");
         setActiveSpeaker(null);
+        activeSpeakerRef.current = null;
       };
       window.speechSynthesis.speak(utterance);
-    } else {
-      console.error("[debug] speechSynthesis not supported in this browser");
     }
   };
 
