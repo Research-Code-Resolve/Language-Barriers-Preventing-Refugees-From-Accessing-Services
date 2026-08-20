@@ -10,7 +10,16 @@ import { generateAnswer, llmStatus } from './src/llm.js';
 import { translateText } from './src/translate.js';
 
 const app = express();
-app.use(cors());
+
+// Restrict CORS to the origins in ALLOWED_ORIGINS (comma-separated) when set —
+// e.g. the Vercel frontend URL in production. Unset = allow any origin (handy
+// for local dev, but set it in production).
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+app.use(cors(allowedOrigins.length ? { origin: allowedOrigins } : {}));
+
 app.use(express.json());
 
 // Load the knowledge base once at startup: curated CSV entries + passages
