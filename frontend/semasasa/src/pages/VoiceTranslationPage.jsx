@@ -138,15 +138,38 @@ export default function VoiceTranslationPage() {
   };
 
   const speakText = (text, lang) => {
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+
+    const reset = () => {
+      setActiveSpeaker(null);
+      activeSpeakerRef.current = null;
+    };
+
+    const speak = () => {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
-      utterance.onend = () => {
-        setActiveSpeaker(null);
-        activeSpeakerRef.current = null;
-      };
+
+      // Pick a voice matching the target language. Without this the browser
+      // uses its default voice, which stays SILENT for a language it cannot
+      // pronounce (e.g. Arabic) — the text shows on screen but nothing is read.
+      const short = lang.split("-")[0].toLowerCase();
+      const voices = window.speechSynthesis.getVoices();
+      const match =
+        voices.find((v) => v.lang.toLowerCase() === lang.toLowerCase()) ||
+        voices.find((v) => v.lang.toLowerCase().startsWith(short));
+      if (match) utterance.voice = match;
+
+      utterance.onend = reset;
+      utterance.onerror = reset; // don't leave the UI stuck if it can't speak
       window.speechSynthesis.speak(utterance);
+    };
+
+    // Voices may load asynchronously; wait for them on the first call.
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.addEventListener("voiceschanged", speak, { once: true });
+    } else {
+      speak();
     }
   };
 
