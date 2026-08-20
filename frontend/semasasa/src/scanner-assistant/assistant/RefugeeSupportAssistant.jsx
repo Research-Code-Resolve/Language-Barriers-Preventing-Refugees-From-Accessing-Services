@@ -8,11 +8,7 @@ import { SafetyNotice, EscalationAlert } from './SafetyNotice';
 import { ArrowRightIcon, FileIcon } from './icons';
 import { sendChatMessage } from './chatService';
 import { t } from './i18n';
-import {
-  getDocumentIntro,
-  getDocumentActionResponse,
-  DOCUMENT_ACTIONS,
-} from './mockResponses';
+import { getDocumentIntro, DOCUMENT_ACTIONS } from './mockResponses';
 
 function formatTime(ts) {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -87,19 +83,25 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
     }
   }, [messages, isTyping]);
 
+  // Map each document action to a real instruction sent to the backend with the
+  // document as context — so it summarises/explains the ACTUAL document instead
+  // of returning a canned template.
+  const DOCUMENT_ACTION_PROMPTS = {
+    explain: 'Explain this document in simple, clear terms.',
+    summarize: 'Summarize this document.',
+    translate_explain: 'Translate this document and explain what it means.',
+    next_steps: 'Based on this document, what should I do next?',
+  };
+
   function handleDocumentAction(action) {
     if (action === 'ask_another') {
       setDocumentText('');
       setMessages([]);
       return;
     }
-    addMessage({ role: 'user', text: DOCUMENT_ACTIONS.find((a) => a.key === action).label });
-    setIsTyping(true);
-    setTimeout(() => {
-      const text = getDocumentActionResponse(action, language);
-      addMessage({ role: 'assistant', text, source: null, isDemo: true, verified: false });
-      setIsTyping(false);
-    }, 600 + Math.random() * 600);
+    const label = DOCUMENT_ACTIONS.find((a) => a.key === action).label;
+    addMessage({ role: 'user', text: label });
+    sendAssistantMessage(DOCUMENT_ACTION_PROMPTS[action] || label);
   }
 
   function handleEscalate(action) {
