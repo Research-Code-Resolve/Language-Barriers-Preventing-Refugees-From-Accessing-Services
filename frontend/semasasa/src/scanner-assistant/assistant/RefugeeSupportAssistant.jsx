@@ -20,8 +20,6 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
   const [isTyping, setIsTyping] = useState(false);
   const [showEscalation, setShowEscalation] = useState(false);
   const [documentText, setDocumentText] = useState('');
-  // A sent message the user chose to edit — loaded back into the input.
-  const [prefill, setPrefill] = useState(null);
   const scrollRef = useRef(null);
 
   const addMessage = useCallback((msg) => {
@@ -66,13 +64,15 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
     sendAssistantMessage(q);
   }, [addMessage, sendAssistantMessage]);
 
-  // Edit a previously sent message: drop it and everything after it (its reply
-  // included), then load the text back into the input so the resent version
-  // replaces the original instead of appending a duplicate.
-  const handleEditMessage = useCallback((text, index) => {
-    setMessages((prev) => prev.slice(0, index));
-    setPrefill({ text, n: Date.now() });
-  }, []);
+  // Edit a previously sent message inline: replace it (and its reply) with the
+  // corrected message and get a fresh answer — like ChatGPT/Claude.
+  const handleSubmitEdit = useCallback((index, text) => {
+    setMessages((prev) => [
+      ...prev.slice(0, index),
+      { role: 'user', text, timestamp: formatTime(Date.now()) },
+    ]);
+    sendAssistantMessage(text);
+  }, [sendAssistantMessage]);
 
   // Receive document text from Document Scanner
   useEffect(() => {
@@ -218,7 +218,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
               key={i}
               message={msg}
               language={language}
-              onEdit={msg.role === 'user' ? (text) => handleEditMessage(text, i) : undefined}
+              onSubmitEdit={msg.role === 'user' ? (text) => handleSubmitEdit(i, text) : undefined}
             />
           ))}
 
@@ -323,7 +323,6 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
           onDocumentAttach={onNavigateScanner}
           disabled={isTyping}
           language={language}
-          prefill={prefill}
         />
       </div>
 

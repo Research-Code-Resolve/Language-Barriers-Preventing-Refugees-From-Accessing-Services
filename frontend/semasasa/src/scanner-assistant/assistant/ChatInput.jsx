@@ -6,7 +6,7 @@ import { t } from './i18n';
 
 const MAX_INPUT_HEIGHT = 150;
 
-export default function ChatInput({ onSend, onDocumentAttach, disabled, language = 'en', prefill }) {
+export default function ChatInput({ onSend, onDocumentAttach, disabled, language = 'en' }) {
   const [value, setValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
@@ -20,15 +20,6 @@ export default function ChatInput({ onSend, onDocumentAttach, disabled, language
     el.style.height = 'auto';
     el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT)}px`;
   }, [value]);
-
-  // Load a previously sent message back into the input for editing/resending.
-  // prefill changes identity on each edit request so re-editing the same text works.
-  useEffect(() => {
-    if (prefill && typeof prefill.text === 'string') {
-      setValue(prefill.text);
-      textareaRef.current?.focus();
-    }
-  }, [prefill]);
 
   function handleSubmit(e) {
     e.preventDefault();

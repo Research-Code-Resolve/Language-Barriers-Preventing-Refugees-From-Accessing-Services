@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import DocumentScanner from './DocumentScanner';
 import ScanStats from './ScanStats';
 import RefugeeSupportAssistant from './assistant/RefugeeSupportAssistant';
@@ -40,19 +41,31 @@ export default function DocumentToolsPage() {
         boxShadow: theme.shadowSoft,
       }}>
         <div style={{
-          maxWidth: 640,
+          maxWidth: 720,
           margin: '0 auto',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
         }}>
           <Link
-            to="/"
-            title={t('home', language)}
-            aria-label={t('home', language)}
-            style={{ display: 'flex', alignItems: 'center', flexShrink: 0, textDecoration: 'none' }}
+            to="/select-service"
+            title={t('back', language)}
+            aria-label={t('back', language)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              flexShrink: 0,
+              textDecoration: 'none',
+              color: theme.textSecondary,
+              padding: '6px 8px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+            }}
           >
-            <img src="/semasasa-logo.png" alt="SemaSasa" style={{ height: 28, width: 'auto', objectFit: 'contain' }} />
+            <ArrowLeft size={18} />
+            <span>{t('back', language)}</span>
           </Link>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <TabButton
@@ -67,6 +80,14 @@ export default function DocumentToolsPage() {
               label={t('aiAssistant', language)}
             />
           </div>
+          <Link
+            to="/"
+            title={t('home', language)}
+            aria-label={t('home', language)}
+            style={{ display: 'flex', alignItems: 'center', flexShrink: 0, textDecoration: 'none' }}
+          >
+            <img src="/semasasa-logo.png" alt="SemaSasa" style={{ height: 26, width: 'auto', objectFit: 'contain' }} />
+          </Link>
         </div>
       </nav>
 

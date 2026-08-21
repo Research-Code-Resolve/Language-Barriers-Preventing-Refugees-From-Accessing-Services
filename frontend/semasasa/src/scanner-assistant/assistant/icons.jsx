@@ -28,3 +28,4 @@ export const PinIcon = base(<><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 
 export const ArrowRightIcon = base(<><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></>);
 export const SpeakerIcon = base(<><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></>);
 export const StopIcon = base(<rect x="6" y="6" width="12" height="12" rx="2" />);
+export const PencilIcon = base(<><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></>);
