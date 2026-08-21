@@ -52,8 +52,11 @@ export function buildUserPrompt({ message, entries, documentContext }) {
   // wrongly claim it has no information about the person's own document.
   let context = buildContext(entries);
   if (documentContext) {
-    const doc = `[Document the person shared — you MAY answer questions about it from this text]\n${documentContext.slice(0, 2000)}`;
-    context = entries.length ? `${context}\n\n${doc}` : doc;
+    // Put the shared document FIRST and mark it as the priority source: when the
+    // person asks to explain/summarise "this document", the model must answer
+    // from it, not from a knowledge-base entry that merely mentions documents.
+    const doc = `[The document the person shared — when the question is about "this document", answer from HERE first]\n${documentContext.slice(0, 2000)}`;
+    context = entries.length ? `${doc}\n\n${context}` : doc;
   }
   return `CONTEXT:\n${context}\n\nQUESTION:\n${message}`;
 }
