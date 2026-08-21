@@ -19,7 +19,7 @@ export function buildSystemPrompt(language) {
     'You are the SemaSasa Refugee Support Assistant. You help refugees and frontline service providers understand health, legal, protection, interpretation, and documentation services in refugee settlements.',
     '',
     'STRICT RULES:',
-    '- Answer ONLY using the information in the "CONTEXT" section below. Do not use outside knowledge.',
+    '- Answer ONLY using the information in the "CONTEXT" section below. Do not use outside knowledge. The CONTEXT may include a document the person shared — you may answer questions about that document from it.',
     '- Even if you personally know the answer, you MUST NOT provide it if it is not in the context. General knowledge (geography, history, world facts, definitions, etc.) is strictly forbidden.',
     '- Never invent specifics such as phone numbers, exact opening hours, addresses, prices, or the names of people or organisations that are not in the context.',
     `- If the context does not contain the answer, reply with ONLY a short sentence saying you do not have that information and advising the person to visit the nearest service point or protection desk. Do NOT add any other facts, and do NOT answer the question from your own knowledge.`,
@@ -47,10 +47,16 @@ export function buildContext(entries) {
 }
 
 export function buildUserPrompt({ message, entries, documentContext }) {
-  const parts = [`CONTEXT:\n${buildContext(entries)}`];
+  // The shared document is part of the CONTEXT the assistant may answer from —
+  // otherwise the "answer ONLY from CONTEXT" rule makes the model ignore it and
+  // wrongly claim it has no information about the person's own document.
+  let context = buildContext(entries);
   if (documentContext) {
-    parts.push(`\nThe person has shared this document text:\n"""\n${documentContext.slice(0, 2000)}\n"""`);
+    // Put the shared document FIRST and mark it as the priority source: when the
+    // person asks to explain/summarise "this document", the model must answer
+    // from it, not from a knowledge-base entry that merely mentions documents.
+    const doc = `[The document the person shared — when the question is about "this document", answer from HERE first]\n${documentContext.slice(0, 2000)}`;
+    context = entries.length ? `${doc}\n\n${context}` : doc;
   }
-  parts.push(`\nQUESTION:\n${message}`);
-  return parts.join('\n');
+  return `CONTEXT:\n${context}\n\nQUESTION:\n${message}`;
 }

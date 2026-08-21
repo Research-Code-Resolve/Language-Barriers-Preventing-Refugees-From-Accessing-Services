@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import DocumentScanner from './DocumentScanner';
 import ScanStats from './ScanStats';
 import RefugeeSupportAssistant from './assistant/RefugeeSupportAssistant';
@@ -39,24 +41,53 @@ export default function DocumentToolsPage() {
         boxShadow: theme.shadowSoft,
       }}>
         <div style={{
-          maxWidth: 520,
+          maxWidth: 720,
           margin: '0 auto',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
           gap: 8,
         }}>
-          <TabButton
-            active={activeTab === 'scanner'}
-            onClick={() => setActiveTab('scanner')}
-            icon={<FileIcon width={18} height={18} />}
-            label={t('documentScanner', language)}
-          />
-          <TabButton
-            active={activeTab === 'assistant'}
-            onClick={() => setActiveTab('assistant')}
-            label={t('aiAssistant', language)}
-          />
+          <Link
+            to="/select-service"
+            title={t('back', language)}
+            aria-label={t('back', language)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              flexShrink: 0,
+              textDecoration: 'none',
+              color: theme.textSecondary,
+              padding: '6px 8px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            <ArrowLeft size={18} />
+            <span>{t('back', language)}</span>
+          </Link>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <TabButton
+              active={activeTab === 'scanner'}
+              onClick={() => setActiveTab('scanner')}
+              icon={<FileIcon width={18} height={18} />}
+              label={t('documentScanner', language)}
+            />
+            <TabButton
+              active={activeTab === 'assistant'}
+              onClick={() => setActiveTab('assistant')}
+              label={t('aiAssistant', language)}
+            />
+          </div>
+          <Link
+            to="/"
+            title={t('home', language)}
+            aria-label={t('home', language)}
+            style={{ display: 'flex', alignItems: 'center', flexShrink: 0, textDecoration: 'none' }}
+          >
+            <img src="/semasasa-logo.png" alt="SemaSasa" style={{ height: 26, width: 'auto', objectFit: 'contain' }} />
+          </Link>
         </div>
       </nav>
 

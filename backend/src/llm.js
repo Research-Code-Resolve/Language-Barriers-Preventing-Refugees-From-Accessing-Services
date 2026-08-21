@@ -16,7 +16,10 @@
 // works through the "openai" provider by setting OPENAI_BASE_URL.
 
 const PROVIDER = (process.env.LLM_PROVIDER || 'none').toLowerCase();
-const MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
+// Default served by the Hugging Face router. NB: a model must be enabled by a
+// provider on the HF account — e.g. Qwen/Qwen2.5-7B-Instruct is currently NOT
+// served and returns 400, so it cannot be the default.
+const MODEL = process.env.LLM_MODEL || 'meta-llama/Llama-3.1-8B-Instruct';
 
 const OLLAMA_URL = (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '');
 const OPENAI_BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
@@ -101,6 +104,15 @@ function extractiveAnswer(entries) {
   return entries[0].answer;
 }
 
+// Guard against degenerate model output. Free HF inference sometimes returns
+// empty text or a run of "?"/replacement characters (seen with Arabic) — serving
+// that to a refugee is worse than the plain knowledge-base answer.
+function looksDegenerate(text) {
+  if (!text || !text.trim()) return true;
+  const junk = (text.match(/[?�]/g) || []).length;
+  return junk >= 10 && junk / text.length > 0.25;
+}
+
 // Returns { text, mode } where mode is 'generated' or 'extractive'.
 export async function generateAnswer({ system, user, entries }) {
   const hasHuggingFace = PROVIDER === 'huggingface' && process.env.HF_TOKEN;
@@ -108,14 +120,17 @@ export async function generateAnswer({ system, user, entries }) {
   const hasOpenAI = PROVIDER === 'openai' && process.env.OPENAI_API_KEY;
 
   try {
-    if (hasHuggingFace) {
-      return { text: await callHuggingFace({ system, user }), mode: 'generated' };
-    }
-    if (isOllama) {
-      return { text: await callOllama({ system, user }), mode: 'generated' };
-    }
-    if (hasOpenAI) {
-      return { text: await callOpenAI({ system, user }), mode: 'generated' };
+    let text;
+    if (hasHuggingFace) text = await callHuggingFace({ system, user });
+    else if (isOllama) text = await callOllama({ system, user });
+    else if (hasOpenAI) text = await callOpenAI({ system, user });
+
+    if (text !== undefined) {
+      if (looksDegenerate(text)) {
+        console.warn('[llm] degenerate output detected, falling back to extractive');
+        return { text: extractiveAnswer(entries), mode: 'extractive' };
+      }
+      return { text, mode: 'generated' };
     }
   } catch (err) {
     console.warn(`[llm] generation failed, falling back to extractive: ${err.message}`);

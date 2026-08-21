@@ -44,7 +44,7 @@ Response: `{ "translatedText": "…" }`
 
 ## How retrieval works
 
-The knowledge base (`../data-ml/refugee_knowledge_base.csv`) is small, so there
+The knowledge base (`knowledge_base/refugee_knowledge_base.csv`) is small, so there
 is **no vector database**. `src/retrieve.js` filters by location, scores
 candidates by keyword overlap, and boosts entries whose category matches the
 requested service type ("Legal & Protection" covers legal + GBV + child
@@ -84,7 +84,7 @@ VITE_TRANSLATE_API=http://localhost:8787/api/translate
 
 ## Knowledge base
 
-Lives in `../knowledge_base/` and has two layers, both searched by the retrieval
+Lives in `knowledge_base/` (inside the backend) and has two layers, both searched by the retrieval
 step (see that folder's README):
 
 1. **`refugee_knowledge_base.csv`** — curated Q&A. Content is **curated, not

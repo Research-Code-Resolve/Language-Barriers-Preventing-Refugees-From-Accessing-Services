@@ -15,8 +15,8 @@ service providers:
 - **Backend** (`backend/`): a Node/Express API providing the RAG chat
   (`POST /api/chat`) and a translation proxy (`POST /api/translate`), keeping the
   translation/LLM token server-side.
-- **Knowledge base** (`knowledge_base/`): curated Q&A entries plus dropped-in
-  source documents (Word/PDF/txt) that are ingested automatically.
+- **Knowledge base** (`backend/knowledge_base/`): curated Q&A entries plus
+  dropped-in source documents (Word/PDF/txt) that are ingested automatically.
 
 Supported languages: English, Arabic, Swahili, French, Somali, Kinyarwanda.
 Coverage focuses on Kakuma (Kenya) and Bidibidi (Uganda).
@@ -24,7 +24,7 @@ Coverage focuses on Kakuma (Kenya) and Bidibidi (Uganda).
 ## Repo Structure
 This repo is organized by track:
 - `/backend` — Node/Express RAG chat + translation API (see `backend/README.md`)
-- `/knowledge_base` — curated CSV + ingested documents for the chatbot
+- `/backend/knowledge_base` — curated CSV + ingested documents for the chatbot
 - `/data-ml` — Document Scanner + Refugee Support Assistant frontend, plus data analysis
 - `/frontend` — SemaSasa voice-translation frontend (separate track)
 - `/project-docs` — research background, meeting notes, onboarding material
