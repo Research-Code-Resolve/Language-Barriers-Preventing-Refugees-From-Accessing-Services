@@ -66,9 +66,11 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
     sendAssistantMessage(q);
   }, [addMessage, sendAssistantMessage]);
 
-  // Load a previously sent message back into the input so the user can edit and
-  // resend it. New object identity each time so re-editing the same text works.
-  const handleEditMessage = useCallback((text) => {
+  // Edit a previously sent message: drop it and everything after it (its reply
+  // included), then load the text back into the input so the resent version
+  // replaces the original instead of appending a duplicate.
+  const handleEditMessage = useCallback((text, index) => {
+    setMessages((prev) => prev.slice(0, index));
     setPrefill({ text, n: Date.now() });
   }, []);
 
@@ -216,7 +218,7 @@ export default function RefugeeSupportAssistant({ pendingDocumentText, onDocumen
               key={i}
               message={msg}
               language={language}
-              onEdit={msg.role === 'user' ? handleEditMessage : undefined}
+              onEdit={msg.role === 'user' ? (text) => handleEditMessage(text, i) : undefined}
             />
           ))}
 
