@@ -31,7 +31,7 @@ function Login() {
         return;
       }
 
-      navigate("/dashboard");
+      navigate("/select-service");
     }, 500);
   };
 

@@ -17,7 +17,6 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
-
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,13 +26,11 @@ function SignUp() {
       ...formData,
       [event.target.name]: event.target.value,
     });
-
     setError("");
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     setError("");
 
     if (!agree) {
@@ -65,15 +62,13 @@ function SignUp() {
         return;
       }
 
-      navigate("/dashboard");
+      navigate("/select-service");
     }, 500);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
-
       <div className="w-full max-w-md">
-
         <div className="text-center mb-8">
           <img
             src="/semasasa-logo.png"
@@ -81,30 +76,23 @@ function SignUp() {
             className="h-8 w-auto"
           />
         </div>
-
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
-
           <h1 className="text-2xl font-bold text-gray-900">
             Create your account
           </h1>
-
           <p className="text-gray-500 mt-2 mb-6">
             Join SemaSasa as a service provider.
           </p>
-
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-5 text-sm">
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-5">
-
             <div>
               <label className="block text-sm font-medium mb-2">
                 Full name
               </label>
-
               <input
                 type="text"
                 name="name"
@@ -115,12 +103,10 @@ function SignUp() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-400"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-2">
                 Email address
               </label>
-
               <input
                 type="email"
                 name="email"
@@ -131,12 +117,10 @@ function SignUp() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-400"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-2">
                 Preferred language
               </label>
-
               <select
                 name="language"
                 value={formData.language}
@@ -147,7 +131,6 @@ function SignUp() {
                 <option value="">
                   Select a language
                 </option>
-
                 <option value="English">English</option>
                 <option value="French">French</option>
                 <option value="Arabic">Arabic</option>
@@ -158,14 +141,11 @@ function SignUp() {
                 <option value="Other">Other</option>
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-2">
                 Password
               </label>
-
               <div className="relative">
-
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -175,7 +155,6 @@ function SignUp() {
                   required
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-20 outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-
                 <button
                   type="button"
                   onClick={() =>
@@ -185,17 +164,13 @@ function SignUp() {
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
-
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-2">
                 Confirm password
               </label>
-
               <div className="relative">
-
                 <input
                   type={
                     showConfirmPassword
@@ -209,7 +184,6 @@ function SignUp() {
                   required
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-20 outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-
                 <button
                   type="button"
                   onClick={() =>
@@ -221,12 +195,9 @@ function SignUp() {
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
                 </button>
-
               </div>
             </div>
-
             <label className="flex items-start gap-3 text-sm text-gray-600">
-
               <input
                 type="checkbox"
                 checked={agree}
@@ -235,14 +206,11 @@ function SignUp() {
                 }
                 className="mt-1"
               />
-
               <span>
                 I agree to the SemaSasa terms and understand
                 how my account information will be used.
               </span>
-
             </label>
-
             <button
               type="submit"
               disabled={loading}
@@ -252,12 +220,9 @@ function SignUp() {
                 ? "Creating account..."
                 : "Create account"}
             </button>
-
           </form>
-
           <p className="text-center text-sm text-gray-600 mt-6">
             Already have an account?{" "}
-
             <Link
               to="/login"
               className="text-cyan-600 font-semibold hover:underline"
@@ -265,9 +230,7 @@ function SignUp() {
               Log in
             </Link>
           </p>
-
         </div>
-
       </div>
     </div>
   );
